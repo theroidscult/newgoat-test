@@ -60,4 +60,4 @@ obj/%.c.o: src/%.c
 
 .PHONY: clean
 clean:
-	rm -rf bin-$(ARCH) obj-$(ARCH) cc-runtime-$(ARCH)
+	rm -rf bin obj

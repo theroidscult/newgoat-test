@@ -1,0 +1,1 @@
+# The Newday Core Protocol

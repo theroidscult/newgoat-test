@@ -23,12 +23,19 @@ endif
 	 	iso -o os.iso
 	 limine/limine bios-install os.iso
 
+QEMU_FLAGS = -cdrom os.iso -m 256M -machine q35 --boot order=d
+
 run: iso
-	qemu-system-x86_64 -cdrom os.iso -m 256M -serial file:hornet.log -machine q35 --boot order=d
+	qemu-system-x86_64 $(QEMU_FLAGS) -serial file:hornet.log
 run-uefi: iso
-	qemu-system-x86_64 -cdrom os.iso -m 256M -serial file:hornet.log -machine q35 --boot order=d -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF.4m.fd
+	qemu-system-x86_64 $(QEMU_FLAGS) -serial file:hornet.log -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF.4m.fd
 
 debug: iso
-	qemu-system-x86_64 -cdrom os.iso -no-shutdown -no-reboot -serial stdio -d int -m 256M -machine q35 --boot order=d
+	qemu-system-x86_64 $(QEMU_FLAGS) -no-shutdown -no-reboot -serial stdio -d int
 debug-uefi: iso
-	qemu-system-x86_64 -cdrom os.iso -no-shutdown -no-reboot -serial stdio -d int -m 256M -machine q35 --boot order=d -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF.4m.fd
+	qemu-system-x86_64 $(QEMU_FLAGS) -no-shutdown -no-reboot -serial stdio -d int -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF.4m.fd
+
+clean:
+	$(MAKE) -C kernel clean
+	rm -rf iso
+
