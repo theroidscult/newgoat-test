@@ -1,4 +1,5 @@
-iso:
+iso: ./kernel
+
 ifeq ($(wildcard limine),)
 	git clone https://github.com/limine-bootloader/limine.git --branch=v7.x-binary --depth=1 --recurse-submodules
 	cp limine/limine.h kernel/src/limine.h
@@ -23,12 +24,11 @@ endif
 	 	iso -o os.iso
 	 limine/limine bios-install os.iso
 
-QEMU_FLAGS = -cdrom os.iso -m 256M -machine q35 --boot order=d
-
+QEMU_FLAGS = -cdrom os.iso -m 256M -machine q35 --boot order=d -display none
 run: iso
-	qemu-system-x86_64 $(QEMU_FLAGS) -serial file:hornet.log
+	qemu-system-x86_64 $(QEMU_FLAGS) -serial file:newgoat.log
 run-uefi: iso
-	qemu-system-x86_64 $(QEMU_FLAGS) -serial file:hornet.log -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF.4m.fd
+	qemu-system-x86_64 $(QEMU_FLAGS) -serial file:newgoat.log -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF.4m.fd
 
 debug: iso
 	qemu-system-x86_64 $(QEMU_FLAGS) -no-shutdown -no-reboot -serial stdio -d int
