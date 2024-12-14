@@ -1,0 +1,3 @@
+[submodule "kernel/src/KrnlAid"]
+	path = kernel/src/KrnlAid
+	url = https://github.com/asrrriel/KrnlAid
