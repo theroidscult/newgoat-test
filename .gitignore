@@ -1,0 +1,7 @@
+limine
+iso
+*.bin
+*.img
+*.iso
+*.c.o
+*.c.d
