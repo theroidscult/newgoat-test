@@ -1,3 +1,5 @@
+.PHONY: all iso run run-uefi
+
 iso: ./kernel
 
 ifeq ($(wildcard limine),)
@@ -24,18 +26,17 @@ endif
 	 	iso -o os.iso
 	 limine/limine bios-install os.iso
 
-QEMU_FLAGS = -cdrom os.iso -m 256M -machine q35 --boot order=d -display none
+QEMU_FLAGS = -cdrom os.iso -m 256M -machine q35 --boot order=d -display none -serial stdio
 run: iso
-	qemu-system-x86_64 $(QEMU_FLAGS) -serial file:newgoat.log
+	qemu-system-x86_64 $(QEMU_FLAGS)
 run-uefi: iso
-	qemu-system-x86_64 $(QEMU_FLAGS) -serial file:newgoat.log -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF.4m.fd
+	qemu-system-x86_64 $(QEMU_FLAGS) -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF.4m.fd
 
 debug: iso
-	qemu-system-x86_64 $(QEMU_FLAGS) -no-shutdown -no-reboot -serial stdio -d int
+	qemu-system-x86_64 $(QEMU_FLAGS) -no-shutdown -no-reboot -d int
 debug-uefi: iso
-	qemu-system-x86_64 $(QEMU_FLAGS) -no-shutdown -no-reboot -serial stdio -d int -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF.4m.fd
+	qemu-system-x86_64 $(QEMU_FLAGS) -no-shutdown -no-reboot -d int -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF.4m.fd
 
 clean:
 	$(MAKE) -C kernel clean
 	rm -rf iso
-
