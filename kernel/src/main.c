@@ -7,6 +7,20 @@ void print_callback(const char c) {
 }
 #define  PRINTF_IMPL
 #include <KrnlAid/utils/printf.h>
+#include <KrnlAid/arch/x86_64/gdt.h>
+
+gdt_entry_t gdt_entries[5] = {{0, 0, 0, 0, 0, 0, 0, 0},
+                          {0xFFFF, 0, 0, 0x9A, 0xAF, 0, 0, 0},
+                          {0xFFFF, 0, 0, 0x92, 0xCF, 0, 0, 0},
+                          {0xFFFF, 0, 0, 0xFA, 0xAF, 0, 0, 0},
+                          {0xFFFF, 0, 0, 0xF2, 0xCF, 0, 0, 0}};
+gdt_pointer_t pointer;
+
+void prepare_gdt() {
+    pointer = make_gdt_pointer(gdt_entries, 5);
+    load_gdt(&pointer);
+    flush_cs_ds_etc(0x08, 0x10);
+}
 
 void hcf() {
     for (;;) {
@@ -16,11 +30,11 @@ void hcf() {
 
 void _start(void) {
     asm("cli");
-
-
     cereal_init_port(0x3F8);
 
-    kprintf("Hello, %s! you 0x%p year old!\n", "world", 10000);
+    prepare_gdt();
+    kprintf("Well we survived a gdt change yayy");
+
 
     hcf();
 }
