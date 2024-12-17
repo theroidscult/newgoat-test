@@ -7,7 +7,7 @@ void print_callback(const char c) {
 }
 #define  PRINTF_IMPL
 #include <KrnlAid/utils/printf.h>
-#include <KrnlAid/arch/x86_64/gdt.h>
+#include <KrnlAid/arch/x86/gdt.h>
 
 gdt_entry_t gdt_entries[5] = {{0, 0, 0, 0, 0, 0, 0, 0},
                           {0xFFFF, 0, 0, 0x9A, 0xAF, 0, 0, 0},
@@ -22,12 +22,7 @@ void prepare_gdt() {
     flush_cs_ds_etc(0x08, 0x10);
 }
 
-extern void idt_stub();
-
-void prepare_idt() {
-
-
-}
+extern void prepare_idt();
 
 void hcf() {
     for (;;) {
@@ -42,7 +37,7 @@ void _start(void) {
     prepare_gdt();
     kprintf("GDT initialized\n");
     prepare_idt();
-
+    kprintf("IDT initialized\n");
 
 
 

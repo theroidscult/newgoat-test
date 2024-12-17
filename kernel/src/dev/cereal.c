@@ -1,5 +1,5 @@
 #include "cereal.h"
-#include <KrnlAid/arch/x86_64/portio.h>
+#include <KrnlAid/arch/x86/portio.h>
 
 int is_transmit_empty(int port) { return inb(port + 5) & 0x20; }
 int serial_received(int port) { return inb(port + 5) & 1; }
