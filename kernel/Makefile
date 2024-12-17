@@ -4,8 +4,8 @@ MAKEFLAGS += -rR
 override OUTPUT := kernel
 
 CC := clang
-AR := ar
 LD := ld
+ASM := nasm
 
 override CFLAGS += \
     -std=gnu11 \
@@ -40,9 +40,12 @@ override LDFLAGS += \
     -T linker.ld \
 	-m elf_x86_64
 
+override ASMFLAGS += -f elf64 
+
 override SRCFILES := $(shell cd src && find -L * -type f | LC_ALL=C sort)
 override CFILES := $(filter %.c,$(SRCFILES))
-override OBJ := $(addprefix obj/,$(CFILES:.c=.c.o))
+override ASMFILES := $(filter %.asm,$(SRCFILES))
+override OBJ := $(addprefix obj/,$(CFILES:.c=.c.o) $(ASMFILES:.asm=.asm.o))
 override HEADER_DEPS := $(addprefix obj/,$(CFILES:.c=.c.d) $(CXXFILES:.cpp=.cpp.d) $(ASFILES:.S=.S.d))
 
 .PHONY: all
@@ -56,7 +59,12 @@ bin/$(OUTPUT): $(OBJ)
 
 obj/%.c.o: src/%.c
 	@mkdir -p "$$(dirname $@)"
-	$(CC) $(CFLAGS) $(CPPFLAGS_C) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
+
+obj/%.asm.o: src/%.asm
+	@mkdir -p "$$(dirname $@)"
+	$(ASM) $(ASMFLAGS) $< -o $@
+
 
 .PHONY: clean
 clean:

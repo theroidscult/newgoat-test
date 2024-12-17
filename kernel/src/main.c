@@ -22,6 +22,13 @@ void prepare_gdt() {
     flush_cs_ds_etc(0x08, 0x10);
 }
 
+extern void idt_stub();
+
+void prepare_idt() {
+
+
+}
+
 void hcf() {
     for (;;) {
         asm ("hlt");
@@ -33,7 +40,14 @@ void _start(void) {
     cereal_init_port(0x3F8);
 
     prepare_gdt();
-    kprintf("Well we survived a gdt change yayy");
+    kprintf("GDT initialized\n");
+    prepare_idt();
+
+
+
+
+
+    kprintf("Hello World!\n");
 
 
     hcf();
