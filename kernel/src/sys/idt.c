@@ -60,3 +60,7 @@ void prepare_idt() {
     idt_pointer_t pointer = make_idt_pointer(entries, 256);
     load_idt(&pointer);
 }
+
+void idt_set_irq(int irq, void (*handler)(void), uint8_t ist) {
+    idt_set_gate(&entries[32+irq], handler, 0x08, ist, IDT_TYPE_INTERRUPT | IDT_ACCESS_PRESENT);
+}

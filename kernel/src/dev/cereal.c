@@ -35,4 +35,3 @@ void cereal_write(int port_num, uint8_t data) {
     __asm__ volatile("sti");
     outb(port_num, data);
 }
-    
