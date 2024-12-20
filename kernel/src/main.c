@@ -11,7 +11,7 @@ void print_callback(const char c) {
 
 #include <sys/pic.h>
 #include <sys/idt.h> 
-#include <mm/pmm.h>
+#include <mm/mm.h>
 
 gdt_entry_t gdt_entries[5] = {{0, 0, 0, 0, 0, 0, 0, 0},
                           {0xFFFF, 0, 0, 0x9A, 0xAF, 0, 0, 0},

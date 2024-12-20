@@ -4,11 +4,16 @@
 #include <stdint.h>
 #include <limine_garbage.h>
 
+#define PAGE_SIZE 0x1000
+
+#define HIGHER_HALF(addr) ((addr) + 0xFFFF800000000000)
+#define LOWER_HALF(addr) ((addr) - 0xFFFF800000000000)
+
 typedef struct __freelist_entry {
     struct __freelist_entry *next;
     uint64_t size;
-} pmm_freelist_entry_t;
+} freelist_entry_t;
 
-void pmm_init(void);
+void mm_init(void);
 
 #endif // __PMM_H__
