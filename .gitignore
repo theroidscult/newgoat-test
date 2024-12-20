@@ -1,7 +1,11 @@
 limine
+
+kernel/obj/kernel
+
+*.[od]
+
 iso
-*.bin
-*.img
-*.iso
-*.c.o
-*.c.d
+os.iso
+
+.cache
+compile_commands.json
