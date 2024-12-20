@@ -37,6 +37,9 @@ debug: iso
 debug-uefi: iso
 	qemu-system-x86_64 $(QEMU_FLAGS) -no-shutdown -no-reboot -d int -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF.4m.fd
 
+setup_clangd: clean
+	bear -- ${MAKE} -C kernel
+
 clean:
 	$(MAKE) -C kernel clean
 	rm -rf iso

@@ -1,3 +1,3 @@
 CompileFlags:
-    Add: ["-std=c99"]
+    Add: ["-std=c99", "-I kernel/src"]
     Compiler: "clang"
