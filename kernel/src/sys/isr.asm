@@ -22,6 +22,8 @@ global ign_nmi
 global ign_alignment
 global ign_virt_stuff
 
+extern panik
+
 %macro pushaq 0
     push rax
     push rcx
@@ -103,28 +105,35 @@ err_simd:
 
 ; crirical errors(instant kernel panic)
 crit_device_not_available:
-    jmp $;TODO: add some kind of BSOD
+    mov rdi, 0
+    call panik
 
 crit_double_fault:
-    jmp $;TODO: add some kind of BSOD
+    mov rdi, 1
+    call panik
 
 crit_invalid_tss:
-    jmp $;TODO: add some kind of BSOD
+    mov rdi, 2
+    call panik
 
 ;NOTE: should not happen on 64 bit
 crit_seg_not_present:
-    jmp $;TODO: add some kind of BSOD
+    mov rdi, 3
+    call panik
 
 crit_stack_segment:
-    jmp $;TODO: add some kind of BSOD
+    mov rdi, 4
+    call panik
 
 ;NOTE: should not happen
 crit_machine_check:
-    jmp $;TODO: add some kind of BSOD
+    mov rdi, 5
+    call panik
 
 ;NOTE: these are unnused but if something goes wrong it is still here
 crit_outdated_or_reserved:
-    jmp $;TODO: add some kind of BSOD
+    mov rdi, 6
+    call panik
 
 ;debug stuff
 dbg_debug:

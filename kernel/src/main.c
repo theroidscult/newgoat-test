@@ -24,9 +24,15 @@ extern void prepare_idt();
 extern void timer_isr();
 
 void hcf() {
-    for (;;) {
+    __asm__ volatile ("cli");
+    while(1){
         __asm__ volatile ("hlt");
     }
+}
+
+void panik(uint32_t code) {
+    kprintf("PANIC: %u\n", code);
+    hcf();
 }
 
 void _start(void) {
@@ -46,7 +52,6 @@ void _start(void) {
 
 
     kprintf("Hello World!\n");
-
 
     hcf();
 }
