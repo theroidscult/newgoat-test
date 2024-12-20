@@ -15,5 +15,7 @@ typedef struct __freelist_entry {
 } freelist_entry_t;
 
 void mm_init(void);
+void* mm_alloc_page();
+void mm_free_pages(void* page, uint64_t size);
 
 #endif // __PMM_H__

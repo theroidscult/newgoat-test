@@ -71,7 +71,7 @@ void mm_init(void) {
     kprintf("Usable memory(after object space allocation):  %u B\n", usable_mem_size);
 }
 
-void* alloc_page() {
+void* mm_alloc_page() {
     freelist_entry_t *toret = tail;
     if(tail == NULL) {
         return NULL;
@@ -85,5 +85,29 @@ void* alloc_page() {
         tail = tail->next;
     }
     usable_mem_size += PAGE_SIZE;
-    return (void*)((char*)toret + PAGE_SIZE);
+    return (void*)toret;
+}
+
+void mm_free_pages(void* page, uint64_t size) {
+    if((uintptr_t)page < (uintptr_t)tail) {
+        if((uintptr_t)page + (size * PAGE_SIZE) > (uintptr_t)tail) {
+            return;
+        }
+        freelist_entry_t *newtail = (freelist_entry_t*)page;
+        newtail->next = tail;
+        newtail->size = size;
+        tail = newtail;
+    } else {
+        freelist_entry_t *cur = tail;
+        while(cur != NULL) {
+            if((uintptr_t)cur->next > (uintptr_t)page) {
+                freelist_entry_t *newent = (freelist_entry_t*)page;
+                newent->next = cur->next;
+                newent->size = size;
+                cur->next = newent;
+                return;
+            }
+            cur = cur->next;
+        }
+    }
 }
