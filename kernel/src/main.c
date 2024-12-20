@@ -11,6 +11,7 @@ void print_callback(const char c) {
 
 #include <sys/pic.h>
 #include <sys/idt.h> 
+#include <mm/pmm.h>
 
 gdt_entry_t gdt_entries[5] = {{0, 0, 0, 0, 0, 0, 0, 0},
                           {0xFFFF, 0, 0, 0x9A, 0xAF, 0, 0, 0},
@@ -41,12 +42,13 @@ void _start(void) {
     kprintf("GDT initialized\n");
     prepare_idt();
     pic_init();
-    pit_start(1000);
-    idt_set_irq(0, timer_isr, 0); 
+    //pit_start(1000);
+    //idt_set_irq(0, timer_isr, 0);
     __asm__ volatile ("sti");
     kprintf("Interrupts enabled\n");
 
-
+    kprintf("Memory initialized\n");
+    pmm_init();
 
 
     kprintf("Hello World!\n");
