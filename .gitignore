@@ -1,8 +1,8 @@
 limine
 
-kernel/obj/kernel
+kernel/bin/kernel
 
-*.[od]
+*.*.[od]
 
 iso
 os.iso
