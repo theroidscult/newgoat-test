@@ -3,7 +3,6 @@
 #include <dev/cereal.h>
 #include <KrnlAid/arch/x86/gdt.h>
 #include <KrnlAid/utils/printf.h>
-#include <KrnlAid/arch/x86/gdt.h>
 
 #include <sys/pic.h>
 #include <sys/idt.h> 
@@ -42,9 +41,8 @@ void _start(void) {
     //idt_set_irq(0, timer_isr, 0);
     __asm__ volatile ("sti");
     kprintf("Interrupts enabled\n");
-
+    mm_init();
     kprintf("Memory initialized\n");
-    pmm_init();
 
 
     kprintf("Hello World!\n");
