@@ -21,6 +21,7 @@ global ign_range_exceeded
 global ign_nmi
 global ign_alignment
 global ign_virt_stuff
+global ign_unregistered_isr 
 
 extern panik
 
@@ -79,6 +80,8 @@ err_gp:
     pushaq
     ; TODO: Do something
     popaq
+
+    jmp $
 
     iretq
 
@@ -160,4 +163,7 @@ ign_alignment:
     iretq
 
 ign_virt_stuff:
+    iretq
+
+ign_unregistered_isr:
     iretq
