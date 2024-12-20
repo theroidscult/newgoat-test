@@ -31,7 +31,28 @@ void hcf() {
 }
 
 void panik(uint32_t code) {
-    kprintf("PANIC: %u\n", code);
+    switch(code) {
+        case 1:
+            kprintf("Device not available\n");
+            break;
+        case 2:
+            kprintf("Double fault\n");
+            break;
+        case 3:
+            kprintf("Invalid TSS\n");
+            break;
+        case 4:
+            kprintf("Segment not present\n");
+            break;
+        case 5:
+            kprintf("Stack segment fault\n");
+            break;
+        case 6:
+            kprintf("Machine check\n");
+            break;
+        case 7:
+            kprintf("Outdated or reserved interrupt\n");
+    }
     hcf();
 }
 
@@ -53,5 +74,5 @@ void _start(void) {
 
     kprintf("Hello World!\n");
 
-    hcf();
+    while(1);
 }
