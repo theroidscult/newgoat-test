@@ -64,15 +64,17 @@ void _start(void) {
     kprintf("GDT initialized\n");
     prepare_idt();
     pic_init();
-    //pit_start(1000);
-    //idt_set_irq(0, timer_isr, 0);
     __asm__ volatile ("sti");
     kprintf("Interrupts enabled\n");
     mm_init();
     kprintf("Memory initialized\n");
 
-
     kprintf("Hello World!\n");
+
+    //start the scheduler
+    //pit_start(1000);
+    //idt_set_irq(0, timer_isr, 0);
+
 
     while(1);
 }
