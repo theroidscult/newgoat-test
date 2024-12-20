@@ -54,7 +54,7 @@ void mm_init(void) {
             continue;
         }
         ent = ent->next;
-}
+    }
 
     if(object_space == NULL) {
         kprintf("failed to reserve object space\n");
@@ -69,4 +69,21 @@ void mm_init(void) {
     usable_mem_size -= object_space_size * PAGE_SIZE;
 
     kprintf("Usable memory(after object space allocation):  %u B\n", usable_mem_size);
+}
+
+void* alloc_page() {
+    freelist_entry_t *toret = tail;
+    if(tail == NULL) {
+        return NULL;
+    }
+    if(tail->size > 1) {
+        freelist_entry_t *new_tail = (freelist_entry_t*)((char*)tail + PAGE_SIZE);
+        new_tail->size = tail->size - 1;
+        new_tail->next = tail->next;
+        tail = new_tail;
+    } else {
+        tail = tail->next;
+    }
+    usable_mem_size += PAGE_SIZE;
+    return (void*)((char*)toret + PAGE_SIZE);
 }
