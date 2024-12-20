@@ -9,11 +9,11 @@
 #include <sys/idt.h> 
 #include <mm/mm.h>
 
-gdt_entry_t gdt_entries[5] = {{0, 0, 0, 0, 0, 0, 0, 0},
-                          {0xFFFF, 0, 0, 0x9A, 0xAF, 0, 0, 0},
-                          {0xFFFF, 0, 0, 0x92, 0xCF, 0, 0, 0},
-                          {0xFFFF, 0, 0, 0xFA, 0xAF, 0, 0, 0},
-                          {0xFFFF, 0, 0, 0xF2, 0xCF, 0, 0, 0}};
+gdt_entry_t gdt_entries[5] = {{0, 0, 0, 0, 0, 0},
+                          {0xFFFF, 0, 0, 0x9A, 0xAF, 0},
+                          {0xFFFF, 0, 0, 0x92, 0xCF, 0},
+                          {0xFFFF, 0, 0, 0xFA, 0xAF, 0},
+                          {0xFFFF, 0, 0, 0xF2, 0xCF, 0}};
 
 void prepare_gdt() {
     gdt_pointer_t pointer = make_gdt_pointer(gdt_entries, 5);

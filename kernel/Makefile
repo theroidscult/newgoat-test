@@ -20,7 +20,7 @@ override CFLAGS += \
     -mcmodel=kernel \
     -I src \
 	-Wall \
-    -Wextra \
+    -Werror \
     -ffreestanding \
     -fno-stack-protector \
     -fno-stack-check \
