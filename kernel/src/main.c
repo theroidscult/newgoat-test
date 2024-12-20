@@ -1,11 +1,7 @@
 #include "sys/pit.h"
 #include <string.h>
 #include <dev/cereal.h>
-
-void print_callback(const char c) {
-    cereal_write(0x3F8, c);
-}
-#define  PRINTF_IMPL
+#include <KrnlAid/arch/x86/gdt.h>
 #include <KrnlAid/utils/printf.h>
 #include <KrnlAid/arch/x86/gdt.h>
 
