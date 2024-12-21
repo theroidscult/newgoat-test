@@ -69,6 +69,36 @@ void _start(void) {
     mm_init();
     kprintf("Memory initialized\n");
 
+    object_t obj = {
+        .magic = 0,
+        .type = OBJ_TYPE_SCHED_THREAD,
+        .data.sched_thread = {
+            .id = 0,
+            .name_ptr = 1,
+            .context = {0}
+        }
+    };
+
+    kprintf("Object 0's ID: %hhx\n", mm_store_obj(&obj));
+
+    object_t obj2 = {
+        .magic = 0,
+        .type = OBJ_TYPE_SCHED_PROC_NAME,
+        .data.sched_proc_name = {
+            .name = "Never gonna give you up"
+        }
+    };
+
+    kprintf("Object 1's ID: %hhx\n", mm_store_obj(&obj2));
+
+    object_t* test = mm_get_obj(0);
+
+    kprintf("Object 0: magic: %hhx, type: %hhx, name_ptr: %hx, id: %hhx\n", test->magic, test->type, test->data.sched_thread.name_ptr, test->data.sched_thread.id);
+
+    object_t* test2 = mm_get_obj(1);
+
+    kprintf("Object 1: magic: %hhx, type: %hhx, name: \"%s\"\n", test2->magic, test2->type, test2->data.sched_proc_name.name);
+
     kprintf("Hello World!\n");
 
     //start the scheduler

@@ -2,12 +2,16 @@
 #include "limine.h"
 #include <stdint.h>
 #include <KrnlAid/utils/printf.h>
+#include <string.h>
 
 freelist_entry_t *head = NULL;
 freelist_entry_t *tail = NULL;
 
+// object space
 void* object_space = NULL;
 const uint64_t object_space_size = 10; // IN PAGES
+void* object_first_free = NULL;
+
 
 //stats
 uint64_t total_mem_size = 0;
@@ -45,6 +49,7 @@ void mm_init(void) {
 
     //reserve object space
     object_space = (void*)mm_alloc_page();
+    object_first_free = object_space;
     for(uint64_t i = 0; i < object_space_size - 1; i++) {
         mm_alloc_page(); //allocate the next page too!
     }
@@ -106,4 +111,40 @@ void mm_free_pages(void* page, uint64_t size) {
     }
     free_mem_size += size * PAGE_SIZE;
     used_mem_size -= size * PAGE_SIZE;
+}
+
+uint32_t mm_store_obj(object_t* obj)
+{
+    if(object_first_free == NULL) {
+        return 0; // out of space; TODO: add more space
+    }
+    uint32_t id = ((uintptr_t)object_first_free - (uintptr_t)object_space) / sizeof(object_t);
+    memcpy(object_first_free, obj, sizeof(object_t));
+    ((object_t*)object_first_free)->magic = OBJ_MAGIC;
+    object_t* cur = object_first_free; 
+    while((uintptr_t)cur < (uintptr_t)object_space + (object_space_size * PAGE_SIZE)) {
+        if(cur->magic == OBJ_MAGIC_FREE) {
+            object_first_free = cur;
+            return id;
+        }
+        cur++;
+    }
+    object_first_free = NULL;
+    return id;
+}
+
+object_t* mm_get_obj(uint32_t id)
+{
+    object_t* obj = object_space + (id * sizeof(object_t));
+    if(obj->magic == OBJ_MAGIC) {
+        return obj;
+    }
+    kprintf("oww 0x%hhx", obj->magic);
+    return NULL;
+}
+
+void mm_free_obj(uint32_t id)
+{
+    object_t* obj = object_space + (id * sizeof(object_t));
+    obj->magic = OBJ_MAGIC_FREE;
 }
