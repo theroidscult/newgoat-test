@@ -4,7 +4,7 @@
 
 void pit_start(uint32_t freq) {
     uint32_t div = PIT_FREQUENCY / freq;
-    outb(PIT_CMD, CMD_BINARY | CMD_MODE2 | CMD_RW_BOTH | CMD_COUNTER0);
-    outb(PIT_COUNTER0, div & 0xFF);
+    outb(PIT_CMD, CONFIG);
+    outb(PIT_COUNTER0, div);
     outb(PIT_COUNTER0, div >> 8);
 }
