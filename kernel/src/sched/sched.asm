@@ -44,4 +44,7 @@ timer_isr:
     mov rdi, rsp
     call sys_timer_isr
     popaq
+
+    add rsp, 8
+
     iretq
