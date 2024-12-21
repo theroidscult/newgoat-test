@@ -14,7 +14,15 @@ typedef struct __freelist_entry {
     uint64_t size;
 } freelist_entry_t;
 
+typedef struct {
+    uint64_t total;
+    uint64_t usable;
+    uint64_t used;
+    uint64_t free;
+} memstats_t;
+
 void mm_init(void);
+memstats_t mm_poll_mstats(void);
 void* mm_alloc_page();
 void mm_free_pages(void* page, uint64_t size);
 

@@ -9,7 +9,11 @@ freelist_entry_t *tail = NULL;
 void* object_space = NULL;
 const uint64_t object_space_size = 10; // IN PAGES
 
+//stats
+uint64_t total_mem_size = 0;
 uint64_t usable_mem_size = 0;
+uint64_t free_mem_size = 0;
+uint64_t used_mem_size = 0;
 
 void mm_init(void) {
     struct limine_memmap_response *response = memmap.response;
@@ -33,10 +37,11 @@ void mm_init(void) {
 
             usable_mem_size += response->entries[i]->length;
         }
+        total_mem_size += response->entries[i]->length;
     }
     head->next = NULL;
 
-    kprintf("Usable memory(before object space allocation): %u B\n", usable_mem_size);
+    free_mem_size = usable_mem_size;
 
     //reserve object space
     object_space = (void*)mm_alloc_page();
@@ -44,6 +49,19 @@ void mm_init(void) {
         mm_alloc_page(); //allocate the next page too!
     }
 
+    kprintf("Total memory: %u B\n", total_mem_size);
+    kprintf("Usable memory: %u B\n", usable_mem_size);
+    kprintf("Free memory: %u B\n", free_mem_size);
+    kprintf("Used memory(post object space): %u B\n", used_mem_size);
+}
+
+memstats_t mm_poll_mstats(void) {
+    return (memstats_t){
+        .total = total_mem_size,
+        .usable = usable_mem_size,
+        .free = free_mem_size,
+        .used = used_mem_size
+    };
 }
 
 void* mm_alloc_page() {
@@ -59,7 +77,8 @@ void* mm_alloc_page() {
     } else {
         tail = tail->next;
     }
-    usable_mem_size += PAGE_SIZE;
+    free_mem_size -= PAGE_SIZE;
+    used_mem_size += PAGE_SIZE;
     return (void*)toret;
 }
 
@@ -85,4 +104,6 @@ void mm_free_pages(void* page, uint64_t size) {
             cur = cur->next;
         }
     }
+    free_mem_size += size * PAGE_SIZE;
+    used_mem_size -= size * PAGE_SIZE;
 }
