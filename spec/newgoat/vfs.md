@@ -5,7 +5,6 @@ The first layer of the tree has `5` directories:
 * `/` - the root of the filesystem
 * `dev:` - devices
 * `proc:` - process information
-* `reg:` - registry
 * `tmp:` - temporary files
 The tree may be implemented as any balanced binary search tree. The BST uses the `full path` of each node as the key.
 
