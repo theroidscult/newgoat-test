@@ -30,7 +30,8 @@ override CFLAGS += \
     -fdata-sections \
     -DLIMINE_API_REVISION=2 \
     -MMD \
-    -MP
+    -MP \
+    -g
 
 override LDFLAGS += \
     -nostdlib \
@@ -38,7 +39,8 @@ override LDFLAGS += \
     -z max-page-size=0x1000 \
     -gc-sections \
     -T linker.ld \
-	-m elf_x86_64
+	-m elf_x86_64 \
+    -g
 
 override ASMFLAGS += -f elf64 
 
