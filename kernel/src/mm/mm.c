@@ -147,4 +147,7 @@ void mm_free_obj(uint32_t id)
 {
     object_t* obj = object_space + (id * sizeof(object_t));
     obj->magic = OBJ_MAGIC_FREE;
+    if((uintptr_t)object_first_free > (uintptr_t)obj) {
+        object_first_free = (void*)obj;
+    }
 }
