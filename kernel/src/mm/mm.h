@@ -35,11 +35,12 @@ typedef struct {
         struct {
             uint16_t id;
             uint32_t name_ptr;
-            sched_context_t context;
+            context_t context;
+            char slack[72];
         } __attribute__((packed)) sched_thread;
         struct {
-            uint64_t next_page;
-            char name[118];
+            uint32_t next_page;
+            char name[250];
         } __attribute__((packed)) sched_proc_name;
     } data;
 } object_t;
