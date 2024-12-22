@@ -139,7 +139,6 @@ object_t* mm_get_obj(uint32_t id)
     if(obj->magic == OBJ_MAGIC) {
         return obj;
     }
-    kprintf("oww 0x%hhx", obj->magic);
     return NULL;
 }
 
