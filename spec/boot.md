@@ -1,4 +1,4 @@
-# The codename "Asriel" Boot protocol
+# The Newgoat Boot protocol
 The kernel must be an ELF executable, and it must have a valid ELF header.
 
 The kernel only recieves the following `boot_info` structure:

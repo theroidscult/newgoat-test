@@ -1,4 +1,4 @@
-# The codename "Asriel" kernel: Newgoat
+# The kernel: Newgoat
 <img src="../../ass-ets/kernel-map.png">
 
 ### HAL: Hardware Abstraction Layer
