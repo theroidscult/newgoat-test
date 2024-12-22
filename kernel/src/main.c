@@ -7,6 +7,7 @@
 #include <sys/pic.h>
 #include <sys/idt.h> 
 #include <mm/mm.h>
+#include <sched/sched.h>
 
 gdt_entry_t gdt_entries[5] = {{0, 0, 0, 0, 0, 0},
                           {0xFFFF, 0, 0, 0x9A, 0xAF, 0},
@@ -52,9 +53,27 @@ void panik(uint32_t code) {
             break;
         case 7:
             kprintf("Outdated or reserved interrupt\n");
+        case 8:
+            kprintf("No process to schedule\n");
+        case 9:
+            kprintf("Process is not a process\n");
     }
     hcf();
 }
+
+void aproc(void) {
+    while(1){
+        cereal_write(0x3F8, 'a');
+    }
+}
+
+void bproc(void) {
+    while(1){
+        cereal_write(0x3F8, 'b');
+    }
+}
+
+
 
 void _start(void) {
     __asm__ volatile("cli");
@@ -68,6 +87,13 @@ void _start(void) {
     kprintf("Interrupts enabled\n");
     mm_init();
     kprintf("Memory initialized\n");
+
+    //initialize the scheduler
+    sched_init();
+
+    //ADd some processes
+    sched_new_proc(aproc);
+    sched_new_proc(bproc);
 
     //start the scheduler
     pit_start(1000);
