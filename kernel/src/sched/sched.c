@@ -1,3 +1,4 @@
+#include "mm/pager.h"
 #include <stdint.h>
 #include <sys/pic.h>
 #include <dev/cereal.h>
@@ -21,6 +22,8 @@ void sched_init() {
 }
 
 void sys_timer_isr(context_t* context) {
+    mm_restore_kernel_pm();
+
     if(push_index == pop_index) {
         panik(8);
     }
@@ -52,12 +55,15 @@ void sys_timer_isr(context_t* context) {
         push_index = 0;
     }
 
+    pager_set_current_pml(proc_obj->data.sched_thread.pagemap);
     pic_eoi(0);
 }
 
 void sched_new_proc(void(*proc)(void)) {
-    //TODO: VMM 
+    pml_entry_t* pm = pager_create_pml();
     void* stack = mm_alloc_page();
+
+    pager_map(pm, (uint64_t)stack, (uint64_t)stack, PML_FLAGS_PRESENT | PML_FLAGS_WRITABLE | PML_FLAGS_NO_EXEC | PML_FLAGS_USER);
 
     object_t proc_obj = {
         .magic = 0,
@@ -66,6 +72,7 @@ void sched_new_proc(void(*proc)(void)) {
             .sched_thread = {
                 .id = push_index,
                 .name_ptr = 0,
+                .pagemap = pm,
                 .context = {
                     .rax = 0,
                     .rbx = 0,

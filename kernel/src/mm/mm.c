@@ -1,11 +1,27 @@
 #include "mm.h"
 #include "limine.h"
+#include "mm/pager.h"
 #include <stdint.h>
 #include <KrnlAid/utils/printf.h>
 #include <string.h>
 
 freelist_entry_t *head = NULL;
 freelist_entry_t *tail = NULL;
+
+//limine garbage
+static volatile struct limine_memmap_request memmap = {
+   .id = LIMINE_MEMMAP_REQUEST,
+   .revision = 0
+};
+
+static volatile struct limine_hhdm_request hhdm = {
+   .id = LIMINE_HHDM_REQUEST,
+   .revision = 0
+};
+uint64_t hhdm_offset = 0;
+
+//kernel stuff
+pml_entry_t* kernel_pm = NULL;
 
 // object space
 void* object_space = NULL;
@@ -21,11 +37,10 @@ uint64_t used_mem_size = 0;
 
 void mm_init(void) {
     struct limine_memmap_response *response = memmap.response;
+    hhdm_offset = hhdm.response->offset;
 
     for (uint64_t i = 0; i < response->entry_count; i++) {
-        if(response->entries[i]->type == LIMINE_MEMMAP_USABLE ||
-           response->entries[i]->type == LIMINE_MEMMAP_ACPI_RECLAIMABLE ||
-           response->entries[i]->type == LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE) {
+        if(response->entries[i]->type == LIMINE_MEMMAP_USABLE) {
 
             freelist_entry_t *newhead = (freelist_entry_t *) HIGHER_HALF(response->entries[i]->base);
             newhead->size = response->entries[i]->length / PAGE_SIZE;
@@ -53,6 +68,9 @@ void mm_init(void) {
     for(uint64_t i = 0; i < object_space_size - 1; i++) {
         mm_alloc_page(); //allocate the next page too!
     }
+
+    //set up the kernel PM
+    kernel_pm = pager_get_current_pml();
 
     kprintf("Total memory: %u B\n", total_mem_size);
     kprintf("Usable memory: %u B\n", usable_mem_size);
@@ -111,6 +129,10 @@ void mm_free_pages(void* page, uint64_t size) {
     }
     free_mem_size += size * PAGE_SIZE;
     used_mem_size -= size * PAGE_SIZE;
+}
+
+void mm_restore_kernel_pm() {
+    pager_set_current_pml(kernel_pm);
 }
 
 uint32_t mm_store_obj(object_t* obj)

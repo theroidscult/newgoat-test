@@ -25,6 +25,10 @@ SECTIONS
         *(.text .text.*)
     } :text
 
+    .krnl_stack : {
+        *(.krnl_stack .krnl_stack.*)
+    }
+
     . = ALIGN(CONSTANT(MAXPAGESIZE));
 
     .rodata : {
@@ -35,6 +39,7 @@ SECTIONS
 
     .data : {
         *(.data .data.*)
+        . = ALIGN(CONSTANT(MAXPAGESIZE));
     } :data
 
     .bss : {

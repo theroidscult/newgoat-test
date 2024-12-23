@@ -3,7 +3,7 @@
 iso: ./kernel
 
 ifeq ($(wildcard limine),)
-	git clone https://github.com/limine-bootloader/limine.git --branch=v7.x-binary --depth=1 --recurse-submodules
+	git clone https://github.com/limine-bootloader/limine.git --branch=v6.x-branch-binary --depth=1 --recurse-submodules
 	cp limine/limine.h kernel/src/limine.h
 	$(MAKE) -C limine
 endif
