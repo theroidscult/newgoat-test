@@ -5,7 +5,7 @@
 #include <sys/context.h>
 #include <mm/mm.h>
 #include <string.h>
-#include <KrnlAid/utils/printf.h>
+#include <printf.h>
 
 extern void panik(uint32_t code);
 
@@ -63,7 +63,11 @@ void sched_new_proc(void(*proc)(void)) {
     pml_entry_t* pm = pager_create_pml();
     void* stack = mm_alloc_page();
 
-    pager_map(pm, (uint64_t)stack, (uint64_t)stack, PML_FLAGS_PRESENT | PML_FLAGS_WRITABLE | PML_FLAGS_NO_EXEC | PML_FLAGS_USER);
+    memset(stack, 0, PAGE_SIZE);
+
+    kprintf("Stack: %p\n", stack);
+
+    pager_map(pm, (uint64_t)stack, (uint64_t)stack, PML_FLAGS_PRESENT | PML_FLAGS_WRITABLE | PML_FLAGS_NO_EXEC);
 
     object_t proc_obj = {
         .magic = 0,
@@ -72,7 +76,7 @@ void sched_new_proc(void(*proc)(void)) {
             .sched_thread = {
                 .id = push_index,
                 .name_ptr = 0,
-                .pagemap = pm,
+                .pagemap = LOWER_HALF(pm),
                 .context = {
                     .rax = 0,
                     .rbx = 0,

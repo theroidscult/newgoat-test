@@ -3,15 +3,13 @@
 
 #include <stdint.h>
 #include <sys/context.h>
-#include "limine.h"
+#include "kernel.h"
 #include "pager.h"
 
 #define PAGE_SIZE 0x1000
 
-extern uint64_t hhdm_offset;
-
-#define HIGHER_HALF(addr) (void*)(((uint64_t)addr) + hhdm_offset)
-#define LOWER_HALF(addr) (void*)(((uint64_t)addr) - hhdm_offset)
+#define HIGHER_HALF(addr) (void*)(((uint64_t)addr) + hhdm_ptr->offset)
+#define LOWER_HALF(addr) (void*)(((uint64_t)addr) - hhdm_ptr->offset)
 
 typedef struct __freelist_entry {
     struct __freelist_entry *next;

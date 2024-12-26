@@ -26,7 +26,7 @@ endif
 	 	iso -o os.iso
 	 limine/limine bios-install os.iso
 
-QEMU_FLAGS = -cdrom os.iso -m 256M -machine q35 --boot order=d -display none -serial stdio
+QEMU_FLAGS = -cdrom os.iso -m 256M -machine q35 --boot order=d -serial stdio
 run: iso
 	qemu-system-x86_64 $(QEMU_FLAGS)
 run-uefi: iso

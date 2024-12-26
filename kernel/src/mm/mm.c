@@ -2,23 +2,13 @@
 #include "limine.h"
 #include "mm/pager.h"
 #include <stdint.h>
-#include <KrnlAid/utils/printf.h>
+#include <printf.h>
 #include <string.h>
+#include <kernel.h>
 
 freelist_entry_t *head = NULL;
 freelist_entry_t *tail = NULL;
 
-//limine garbage
-static volatile struct limine_memmap_request memmap = {
-   .id = LIMINE_MEMMAP_REQUEST,
-   .revision = 0
-};
-
-static volatile struct limine_hhdm_request hhdm = {
-   .id = LIMINE_HHDM_REQUEST,
-   .revision = 0
-};
-uint64_t hhdm_offset = 0;
 
 //kernel stuff
 pml_entry_t* kernel_pm = NULL;
@@ -36,14 +26,12 @@ uint64_t free_mem_size = 0;
 uint64_t used_mem_size = 0;
 
 void mm_init(void) {
-    struct limine_memmap_response *response = memmap.response;
-    hhdm_offset = hhdm.response->offset;
+    for (uint64_t i = 0; i < memmap_ptr->entry_count; i++) {
+        if(memmap_ptr->entries[i]->type == LIMINE_MEMMAP_USABLE ||
+           memmap_ptr->entries[i]->type == LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE) {
 
-    for (uint64_t i = 0; i < response->entry_count; i++) {
-        if(response->entries[i]->type == LIMINE_MEMMAP_USABLE) {
-
-            freelist_entry_t *newhead = (freelist_entry_t *) HIGHER_HALF(response->entries[i]->base);
-            newhead->size = response->entries[i]->length / PAGE_SIZE;
+            freelist_entry_t *newhead = (freelist_entry_t *) HIGHER_HALF(memmap_ptr->entries[i]->base);
+            newhead->size = memmap_ptr->entries[i]->length / PAGE_SIZE;
 
             if(head == NULL) {
                 head = newhead;
@@ -54,9 +42,9 @@ void mm_init(void) {
             head->next = newhead;
             head = newhead;
 
-            usable_mem_size += response->entries[i]->length;
+            usable_mem_size += memmap_ptr->entries[i]->length;
         }
-        total_mem_size += response->entries[i]->length;
+        total_mem_size += memmap_ptr->entries[i]->length;
     }
     head->next = NULL;
 
@@ -88,7 +76,7 @@ memstats_t mm_poll_mstats(void) {
 }
 
 void* mm_alloc_page() {
-    freelist_entry_t *toret = tail;
+    freelist_entry_t *toret = LOWER_HALF(tail);
     if(tail == NULL) {
         return NULL;
     }

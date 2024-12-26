@@ -3,46 +3,42 @@ MAKEFLAGS += -rR
 
 override OUTPUT := kernel
 
-CC := clang
+CC := gcc
 LD := ld
 ASM := nasm
 
 override CFLAGS += \
-    -std=gnu11 \
-    -target x86_64-unknown-none \
+    -I src \
+    -Wall \
+    -Wextra \
+    -Werror \
+    -std=gnu99 \
+    -ffreestanding \
+    -fno-stack-protector \
+    -fno-stack-check \
+    -fno-lto \
+    -fno-PIE \
+    -fno-PIC \
     -m64 \
     -march=x86-64 \
+    -mabi=sysv \
+    -mcmodel=kernel \
     -mno-80387 \
     -mno-mmx \
     -mno-sse \
     -mno-sse2 \
     -mno-red-zone \
-    -mcmodel=kernel \
-    -I src \
-	-Wall \
-    -Werror \
-    -ffreestanding \
-    -fno-stack-protector \
-    -fno-stack-check \
-    -fno-lto \
-    -fno-PIC \
-    -ffunction-sections \
-    -fdata-sections \
-    -DLIMINE_API_REVISION=2 \
-    -MMD \
-    -MP \
     -g
 
 override LDFLAGS += \
     -nostdlib \
     -static \
-    -z max-page-size=0x1000 \
-    -gc-sections \
-    -T linker.ld \
 	-m elf_x86_64 \
+    -z max-page-size=0x1000 \
+    -T linker.ld \
     -g
 
-override ASMFLAGS += -f elf64 
+override ASMFLAGS += -Wall -f elf64 
 
 override SRCFILES := $(shell cd src && find -L * -type f | LC_ALL=C sort)
 override CFILES := $(filter %.c,$(SRCFILES))

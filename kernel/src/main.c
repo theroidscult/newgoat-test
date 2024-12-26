@@ -4,16 +4,29 @@
 #include <string.h>
 #include <dev/cereal.h>
 #include <KrnlAid/arch/x86/gdt.h>
-#include <KrnlAid/utils/printf.h>
+#include <printf.h>
 
 #include <sys/pic.h>
 #include <sys/idt.h> 
 #include <mm/mm.h>
 #include <sched/sched.h>
 
-#define KERNEL_STACK_SIZE 8 * PAGE_SIZE
+//limine garbage
+static volatile struct limine_memmap_request memmap = {
+   .id = LIMINE_MEMMAP_REQUEST,
+   .revision = 0
+};
 
-__attribute__((section(".krnl_stack"))) uint8_t kernel_stack[KERNEL_STACK_SIZE];
+static volatile struct limine_hhdm_request hhdm = {
+   .id = LIMINE_HHDM_REQUEST,
+   .revision = 0
+};
+struct limine_memmap_response* memmap_ptr = NULL;
+struct limine_hhdm_response* hhdm_ptr = NULL;
+
+
+#define KERNEL_STACK_SIZE 8 * PAGE_SIZE
+static uint8_t kernel_stack[KERNEL_STACK_SIZE];
 
 tss_t tss;
 
@@ -25,7 +38,7 @@ struct {
                 {0xFFFF, 0, 0, 0x92, 0xCF, 0},
                 {0xFFFF, 0, 0, 0xFA, 0xAF, 0},
                 {0xFFFF, 0, 0, 0xF2, 0xCF, 0}},
-                {0,0,0,0,0,0,0}};
+                {0,0,0,0,0,0,0,0}};
 
 void prepare_gdt() {
     gdt_entries.tss = make_tss_entry(&tss, TSS_ACCESS_TYPE_MODE_DEP);
@@ -66,10 +79,13 @@ void panik(uint32_t code) {
             break;
         case 7:
             kprintf("Outdated or reserved interrupt\n");
+            break;
         case 8:
             kprintf("No process to schedule\n");
+            break;
         case 9:
             kprintf("Process is not a process\n");
+            break;
     }
     hcf();
 }
@@ -82,6 +98,9 @@ void testproc(void) {
 void _start(void) {
     __asm__ volatile("cli");
     cereal_init_port(0x3F8);
+
+    memmap_ptr = (struct limine_memmap_response*)memmap.response;
+    hhdm_ptr = (struct limine_hhdm_response*)hhdm.response;
 
     prepare_gdt();
     kprintf("GDT initialized\n");
@@ -103,9 +122,9 @@ void _start(void) {
     sched_new_proc(testproc);
 
     //start the scheduler
-    pit_start(1000);
-    pic_unmask(0);
     idt_set_irq(0, timer_isr, 1);
+    pic_unmask(0);
+    pit_start(1000);
 
     while(1);
 }
