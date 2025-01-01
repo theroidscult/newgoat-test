@@ -114,6 +114,7 @@ void _start(void) {
 
     //set the kernel stack + ist1
     tss.rsp0 = (uint64_t)kernel_stack + KERNEL_STACK_SIZE;
+    tss.ist[0] = (uint64_t)kernel_stack + KERNEL_STACK_SIZE;
 
     //initialize the scheduler
     sched_init();
@@ -122,7 +123,7 @@ void _start(void) {
     sched_new_proc(testproc);
 
     //start the schedulerk
-    idt_set_irq(0, timer_isr, 0);
+    idt_set_irq(0, timer_isr, 1);
     pic_unmask(0);
     pit_start(1000);
 
