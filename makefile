@@ -26,7 +26,7 @@ endif
 	 	iso -o os.iso
 	 limine/limine bios-install os.iso
 
-QEMU_FLAGS = -cdrom os.iso -m 256M -machine q35 --boot order=d -serial stdio
+QEMU_FLAGS = -cdrom os.iso -m 256M -machine q35 --boot order=d -display none -serial stdio
 run: iso
 	qemu-system-x86_64 $(QEMU_FLAGS)
 run-uefi: iso
@@ -36,6 +36,11 @@ debug: iso
 	qemu-system-x86_64 $(QEMU_FLAGS) -no-shutdown -no-reboot -d int
 debug-uefi: iso
 	qemu-system-x86_64 $(QEMU_FLAGS) -no-shutdown -no-reboot -d int -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF.4m.fd
+debug-gdb: iso
+	qemu-system-x86_64 $(QEMU_FLAGS) -no-shutdown -no-reboot -d int -s -S
+debug-gdb-uefi: iso
+	qemu-system-x86_64 $(QEMU_FLAGS) -no-shutdown -no-reboot -d int -s -S -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF.4m.fd
+
 
 setup_clangd: clean
 	bear -- ${MAKE} -C kernel

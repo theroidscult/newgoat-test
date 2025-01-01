@@ -41,10 +41,11 @@ struct {
                 {0,0,0,0,0,0,0,0}};
 
 void prepare_gdt() {
-    gdt_entries.tss = make_tss_entry(&tss, TSS_ACCESS_TYPE_MODE_DEP);
+    gdt_entries.tss = make_tss_entry(&tss);
     gdt_pointer_t pointer = make_gdt_pointer((gdt_entry_t*)&gdt_entries, 7);
     load_gdt(&pointer);
     flush_cs_ds_etc(0x08, 0x10);
+    load_tss(0x28);
 }
 
 extern void prepare_idt();
@@ -121,7 +122,7 @@ void _start(void) {
     //ADd some processes
     sched_new_proc(testproc);
 
-    //start the scheduler
+    //start the schedulerk
     idt_set_irq(0, timer_isr, 1);
     pic_unmask(0);
     pit_start(1000);

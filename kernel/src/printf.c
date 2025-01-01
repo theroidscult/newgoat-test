@@ -12,5 +12,9 @@
 #include <KrnlAid/utils/nanoprintf.h>
 
 void print_char(int c, __attribute__((unused)) void *ctx) {
+    if(c == '\n') {
+        cereal_write(0x3f8, '\r'); //fuck qemu
+    }
+
     cereal_write(0x3f8, (char)c);
 }
