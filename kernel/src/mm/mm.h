@@ -23,15 +23,12 @@ typedef struct {
     uint64_t free;
 } memstats_t;
 
-#define OBJ_MAGIC 0x55
-#define OBJ_MAGIC_FREE 0
-
-#define OBJ_TYPE_SCHED_THREAD 0
-#define OBJ_TYPE_SCHED_PROC_NAME 1
+#define OBJ_TYPE_NONE 0
+#define OBJ_TYPE_SCHED_THREAD 1
+#define OBJ_TYPE_SCHED_PROC_NAME 2
 
 typedef struct {
-    uint8_t magic;
-    uint8_t type;
+    uint16_t type;
     union {
         struct {
             uint16_t id;

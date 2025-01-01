@@ -130,10 +130,9 @@ uint32_t mm_store_obj(object_t* obj)
     }
     uint32_t id = ((uintptr_t)object_first_free - (uintptr_t)object_space) / sizeof(object_t);
     memcpy(object_first_free, obj, sizeof(object_t));
-    ((object_t*)object_first_free)->magic = OBJ_MAGIC;
     object_t* cur = object_first_free; 
     while((uintptr_t)cur < (uintptr_t)object_space + (object_space_size * PAGE_SIZE)) {
-        if(cur->magic == OBJ_MAGIC_FREE) {
+        if(cur->type == OBJ_TYPE_NONE) {
             object_first_free = cur;
             return id;
         }
@@ -145,17 +144,13 @@ uint32_t mm_store_obj(object_t* obj)
 
 object_t* mm_get_obj(uint32_t id)
 {
-    object_t* obj = object_space + (id * sizeof(object_t));
-    if(obj->magic == OBJ_MAGIC) {
-        return obj;
-    }
-    return NULL;
+    return object_space + (id * sizeof(object_t));
 }
 
 void mm_free_obj(uint32_t id)
 {
     object_t* obj = object_space + (id * sizeof(object_t));
-    obj->magic = OBJ_MAGIC_FREE;
+    obj->type = OBJ_TYPE_NONE;
     if((uintptr_t)object_first_free > (uintptr_t)obj) {
         object_first_free = (void*)obj;
     }

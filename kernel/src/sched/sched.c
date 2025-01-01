@@ -70,7 +70,6 @@ void sched_new_proc(void(*proc)(void)) {
     pager_map(pm, (uint64_t)stack, (uint64_t)stack, PML_FLAGS_PRESENT | PML_FLAGS_WRITABLE | PML_FLAGS_NO_EXEC);
 
     object_t proc_obj = {
-        .magic = 0,
         .type = OBJ_TYPE_SCHED_THREAD,
         .data = {
             .sched_thread = {

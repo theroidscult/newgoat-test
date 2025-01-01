@@ -10,7 +10,7 @@ pml_entry_t* pager_get_current_pml(void){
 
     __asm__ volatile ("mov %%cr3, %0" : "=r" (toret));
 
-    return (pml_entry_t*)HIGHER_HALF(toret & 0x000ffffffffff000);
+    return (pml_entry_t*)(toret & 0x000ffffffffff000);
 }
 
 void pager_set_current_pml(pml_entry_t* pml){
@@ -24,7 +24,9 @@ void pager_invlpg(uint64_t va){
 
 pml_entry_t* pager_create_pml(void){
     pml_entry_t* toret = HIGHER_HALF(mm_alloc_page());
-    pml_entry_t* cur = pager_get_current_pml();
+    pml_entry_t* cur = HIGHER_HALF(pager_get_current_pml());
+
+    kprintf("toret: 0x%llx\n cur: 0x%llx\n", toret, cur);
 
     for(int i = 0; i < 512; i++){
         if(i < 256)
