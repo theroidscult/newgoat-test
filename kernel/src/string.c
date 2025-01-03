@@ -51,3 +51,13 @@ int memcmp(const void *s1, const void *s2, size_t n) {
 
     return 0;
 }
+
+uint64_t strlen(const char *s)
+{
+    uint64_t len = 0;
+    while (*s) {
+        len++;
+        s++;
+    }
+    return len;
+}

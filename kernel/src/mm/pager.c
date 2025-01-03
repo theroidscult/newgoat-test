@@ -26,8 +26,6 @@ pml_entry_t* pager_create_pml(void){
     pml_entry_t* toret = HIGHER_HALF(mm_alloc_page());
     pml_entry_t* cur = HIGHER_HALF(pager_get_current_pml());
 
-    kprintf("toret: 0x%llx\n cur: 0x%llx\n", toret, cur);
-
     for(int i = 0; i < 512; i++){
         if(i < 256)
             toret[i] = 0;
@@ -39,14 +37,12 @@ pml_entry_t* pager_create_pml(void){
 }
 
 pml_entry_t* pager_get_next_lvl(pml_entry_t* prev, uint64_t index,uint64_t flags){
-    kprintf("Getting next level from prev 0x%llx at index %u\n",prev, index);
     pml_entry_t entry = prev[index];
 
     if(!(entry & PML_FLAGS_PRESENT)){
         void* pa = HIGHER_HALF(mm_alloc_page());
         memset(pa, 0, PAGE_SIZE);
         prev[index] = (uint64_t)LOWER_HALF(pa) | flags;
-        kprintf("Allocated 0x%llx\n", prev[index]);
         return (pml_entry_t*)pa;
     }
 
@@ -58,9 +54,6 @@ void pager_map(pml_entry_t* pml, uint64_t va, uint64_t pa, uint64_t flags){
     uint64_t pml3_index = (va >> 30) & 0x1ff;
     uint64_t pml2_index = (va >> 21) & 0x1ff;
     uint64_t pml1_index = (va >> 12) & 0x1ff;
-
-    kprintf("Mapping 0x%llx to 0x%llx in pagemap 0x%llx with flags 0x%x\n", va, pa, pml, flags);
-    kprintf("PML4 index: %u, PML3 index: %u, PML2 index: %u, PML1 index: %u\n", pml4_index, pml3_index, pml2_index, pml1_index);
 
     pml_entry_t* pml3 = pager_get_next_lvl(pml, pml4_index, flags);
     pml_entry_t* pml2 = pager_get_next_lvl(pml3, pml3_index, flags);

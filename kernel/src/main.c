@@ -14,12 +14,19 @@
 //limine garbage
 static volatile struct limine_memmap_request memmap = {
    .id = LIMINE_MEMMAP_REQUEST,
-   .revision = 0
+   .revision = 0,
+   .response = 0
 };
 
 static volatile struct limine_hhdm_request hhdm = {
    .id = LIMINE_HHDM_REQUEST,
-   .revision = 0
+   .revision = 0,
+   .response = 0
+};
+static volatile struct limine_module_request modules = {
+   .id = LIMINE_MODULE_REQUEST,
+   .revision = 0,
+   .response = 0
 };
 struct limine_memmap_response* memmap_ptr = NULL;
 struct limine_hhdm_response* hhdm_ptr = NULL;
@@ -46,6 +53,19 @@ void prepare_gdt() {
     load_gdt(&pointer);
     flush_cs_ds_etc(0x08, 0x10);
     load_tss(0x28);
+}
+
+void get_adi_drivers(){
+    kprintf("Response revision: %d\n", modules.response->revision);
+    kprintf("Response module count: %d\n", modules.response->module_count);
+    for(uint64_t i = 0; i < modules.response->module_count; i++){
+        if(modules.response->modules[i] == NULL){
+            kprintf("Module %d is NULL\n", i);
+            continue;
+        }
+        kprintf("Module address: %p\n", modules.response->modules[i]);
+        kprintf("Module: %s\n", modules.response->modules[i]->path);
+    }
 }
 
 extern void prepare_idt();
@@ -112,17 +132,15 @@ void _start(void) {
     mm_init();
     kprintf("Memory initialized\n");
 
-    //set the kernel stack + ist1
     tss.rsp0 = (uint64_t)kernel_stack + KERNEL_STACK_SIZE;
     tss.ist[0] = (uint64_t)kernel_stack + KERNEL_STACK_SIZE;
 
-    //initialize the scheduler
+    get_adi_drivers();
+
     sched_init();
 
-    //ADd some processes
     sched_new_proc(testproc);
 
-    //start the schedulerk
     idt_set_irq(0, timer_isr, 1);
     pic_unmask(0);
     pit_start(1000);

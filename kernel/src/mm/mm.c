@@ -63,7 +63,7 @@ void mm_init(void) {
     kprintf("Total memory: %u B\n", total_mem_size);
     kprintf("Usable memory: %u B\n", usable_mem_size);
     kprintf("Free memory: %u B\n", free_mem_size);
-    kprintf("Used memory(post object space): %u B\n", used_mem_size);
+    kprintf("Used memory: %u B\n", used_mem_size);
 }
 
 memstats_t mm_poll_mstats(void) {

@@ -65,8 +65,6 @@ void sched_new_proc(void(*proc)(void)) {
 
     memset(stack, 0, PAGE_SIZE);
 
-    kprintf("Stack: %p\n", stack);
-
     pager_map(pm, (uint64_t)stack, (uint64_t)stack, PML_FLAGS_PRESENT | PML_FLAGS_WRITABLE | PML_FLAGS_NO_EXEC);
 
     object_t proc_obj = {

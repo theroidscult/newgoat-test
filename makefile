@@ -15,8 +15,9 @@ endif
 	mkdir -p iso/EFI/BOOT
 	mkdir -p iso/boot
 
-	cp cfg/limine.cfg limine/limine-bios.sys limine/limine-bios-cd.bin limine/limine-uefi-cd.bin iso/
+	cp assets/limine.cfg limine/limine-bios.sys limine/limine-bios-cd.bin limine/limine-uefi-cd.bin iso/
 	cp kernel/bin/kernel iso/boot/kernel.bin
+	cp assets/testdriver.adi iso/boot/
 	cp limine/BOOT*.EFI iso/EFI/BOOT/
 
 	 xorriso -as mkisofs -b limine-bios-cd.bin \
