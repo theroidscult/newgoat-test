@@ -9,17 +9,14 @@
 
 extern void panik(uint32_t code);
 
-#define QUEUE_SUZE PAGE_SIZE / 4
+#define QUEUE_SUZE PAGE_SIZE / sizeof(uint32_t)
 
-uint32_t* proc_queue = 0;
+uint32_t proc_queue[QUEUE_SUZE];
+
 uint32_t  push_index = 0;
 uint32_t  pop_index = 0;
 
 uint32_t current_proc_id = 0xFFFFFFFF;
-
-void sched_init() {
-    proc_queue = mm_alloc_page();
-}
 
 void sys_timer_isr(context_t* context) {
     mm_restore_kernel_pm();
@@ -59,54 +56,16 @@ void sys_timer_isr(context_t* context) {
     pic_eoi(0);
 }
 
-void sched_new_proc(void(*proc)(void)) {
-    pml_entry_t* pm = pager_create_pml();
-    void* stack = mm_alloc_page();
-
-    memset(stack, 0, PAGE_SIZE);
-
-    pager_map(pm, (uint64_t)stack, (uint64_t)stack, PML_FLAGS_PRESENT | PML_FLAGS_WRITABLE | PML_FLAGS_NO_EXEC);
-
-    object_t proc_obj = {
-        .type = OBJ_TYPE_SCHED_THREAD,
-        .data = {
-            .sched_thread = {
-                .id = push_index,
-                .name_ptr = 0,
-                .pagemap = LOWER_HALF(pm),
-                .context = {
-                    .rax = 0,
-                    .rbx = 0,
-                    .rcx = 0,
-                    .rdx = 0,
-                    .rsi = 0,
-                    .rdi = 0,
-                    .r8 = 0,
-                    .r9 = 0,
-                    .r10 = 0,
-                    .r11 = 0,
-                    .r12 = 0,
-                    .r13 = 0,
-                    .r14 = 0,
-                    .r15 = 0,
-                    .error = 0,
-                    .rip = (uint64_t)proc,
-                    .rsp = (uint64_t)stack + PAGE_SIZE,
-                    .rbp = (uint64_t)stack + PAGE_SIZE,
-
-                    .cs = 0x8,
-                    .ss = 0x10,
-                    .rflags = 0x202
-                }
-            }
-        }
-    };
-
-    uint32_t id = mm_store_obj(&proc_obj);
-    proc_queue[push_index] = id;
-    push_index++;
-
+void sched_new_proc(object_t* proc_obj) {
+    uint32_t id = mm_store_obj(proc_obj);
     if(push_index > QUEUE_SUZE) {
         push_index = 0;
     }
+    proc_queue[push_index] = id;
+    push_index++;
+
+}
+
+uint32_t sched_get_next_proc_id() {
+    return push_index;
 }

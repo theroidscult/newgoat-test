@@ -1,3 +1,6 @@
 [submodule "kernel/src/KrnlAid"]
 	path = kernel/src/KrnlAid
 	url = https://github.com/asrrriel/KrnlAid
+[submodule "kernel/src/libadi"]
+	path = kernel/src/libadi
+	url = https://github.com/project-adi/libadi

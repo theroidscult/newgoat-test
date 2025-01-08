@@ -2,7 +2,10 @@
 #include "sys/pit.h"
 #include <stdint.h>
 #include <string.h>
+
 #include <dev/cereal.h>
+#include <dev/adi/adi.h>
+
 #include <KrnlAid/arch/x86/gdt.h>
 #include <printf.h>
 
@@ -28,6 +31,7 @@ static volatile struct limine_module_request modules = {
    .revision = 0,
    .response = 0
 };
+
 struct limine_memmap_response* memmap_ptr = NULL;
 struct limine_hhdm_response* hhdm_ptr = NULL;
 
@@ -56,15 +60,14 @@ void prepare_gdt() {
 }
 
 void get_adi_drivers(){
-    kprintf("Response revision: %d\n", modules.response->revision);
-    kprintf("Response module count: %d\n", modules.response->module_count);
     for(uint64_t i = 0; i < modules.response->module_count; i++){
         if(modules.response->modules[i] == NULL){
             kprintf("Module %d is NULL\n", i);
             continue;
         }
-        kprintf("Module address: %p\n", modules.response->modules[i]);
-        kprintf("Module: %s\n", modules.response->modules[i]->path);
+        if(ends_with(modules.response->modules[i]->path, ".adi")){
+            adi_load((const char*)modules.response->modules[i]->address);
+        }
     }
 }
 
@@ -137,9 +140,49 @@ void _start(void) {
 
     get_adi_drivers();
 
-    sched_init();
+    pml_entry_t* pm = pager_create_pml();
+    void* stack = HIGHER_HALF(mm_alloc_page());
 
-    sched_new_proc(testproc);
+    memset(stack, 0, PAGE_SIZE);
+
+    pager_map(pm, (uint64_t)stack, (uint64_t)stack, PML_FLAGS_PRESENT | PML_FLAGS_WRITABLE | PML_FLAGS_NO_EXEC);
+
+    object_t proc_obj = {
+        .type = OBJ_TYPE_SCHED_THREAD,
+        .data = {
+            .sched_thread = {
+                .id = sched_get_next_proc_id(),
+                .name_ptr = 0,
+                .pagemap = LOWER_HALF(pm),
+                .context = {
+                    .rax = 0,
+                    .rbx = 0,
+                    .rcx = 0,
+                    .rdx = 0,
+                    .rsi = 0,
+                    .rdi = 0,
+                    .r8 = 0,
+                    .r9 = 0,
+                    .r10 = 0,
+                    .r11 = 0,
+                    .r12 = 0,
+                    .r13 = 0,
+                    .r14 = 0,
+                    .r15 = 0,
+                    .error = 0,
+                    .rip = (uint64_t)testproc,
+                    .rsp = (uint64_t)stack + PAGE_SIZE,
+                    .rbp = (uint64_t)stack + PAGE_SIZE,
+
+                    .cs = 0x8,
+                    .ss = 0x10,
+                    .rflags = 0x202
+                }
+            }
+        }
+    };
+
+    sched_new_proc(&proc_obj);
 
     idt_set_irq(0, timer_isr, 1);
     pic_unmask(0);

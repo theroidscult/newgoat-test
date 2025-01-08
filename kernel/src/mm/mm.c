@@ -27,8 +27,7 @@ uint64_t used_mem_size = 0;
 
 void mm_init(void) {
     for (uint64_t i = 0; i < memmap_ptr->entry_count; i++) {
-        if(memmap_ptr->entries[i]->type == LIMINE_MEMMAP_USABLE ||
-           memmap_ptr->entries[i]->type == LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE) {
+        if(memmap_ptr->entries[i]->type == LIMINE_MEMMAP_USABLE) {
 
             freelist_entry_t *newhead = (freelist_entry_t *) HIGHER_HALF(memmap_ptr->entries[i]->base);
             newhead->size = memmap_ptr->entries[i]->length / PAGE_SIZE;

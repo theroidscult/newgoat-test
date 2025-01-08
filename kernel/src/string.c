@@ -1,5 +1,4 @@
-#include <stdint.h>
-#include <stddef.h>
+#include <string.h>
 
 void *memcpy(void *dest, const void *src, size_t n) {
     uint8_t *pdest = dest;
@@ -60,4 +59,22 @@ uint64_t strlen(const char *s)
         s++;
     }
     return len;
+}
+
+bool ends_with(const char *s, const char *suffix) {
+    size_t s_len = strlen(s);
+    size_t suffix_len = strlen(suffix);
+
+    if (s_len < suffix_len) {
+        return false;
+    }
+
+
+    for (size_t i = 0; i < suffix_len; i++) {
+        if (s[s_len - suffix_len + i] != suffix[i]) {
+            return false;
+        }
+    }
+
+    return true;
 }
