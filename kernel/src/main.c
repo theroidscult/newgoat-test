@@ -66,7 +66,7 @@ void get_adi_drivers(){
             continue;
         }
         if(ends_with(modules.response->modules[i]->path, ".adi")){
-            adi_load((const char*)modules.response->modules[i]->address);
+            adi_load((const char*)modules.response->modules[i]->address, modules.response->modules[i]->size);
         }
     }
 }

@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-uint32_t adi_load(const char* drv_file);
+uint32_t adi_load(const char* drv_file,uint32_t size);
 
 #endif // __ADI_H__

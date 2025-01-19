@@ -11,7 +11,7 @@
 
 #include <KrnlAid//utils/math.h>
 
-uint32_t adi_load(const char* drv_file) {
+uint32_t adi_load(const char* drv_file,__attribute__((unused)) uint32_t size){
     adi_ff_header_t* header = (adi_ff_header_t*)drv_file;
     char* string_table = (char*)drv_file + header->string_table_offset;
     adi_ff_metalang_t* metalang_table = (adi_ff_metalang_t*)(drv_file + header->metalang_table_offset);
@@ -29,19 +29,6 @@ uint32_t adi_load(const char* drv_file) {
 
     void* pagemap = pager_create_pml();
 
-    for(uint64_t i = 0; i < header->segment_table_size / sizeof(adi_ff_segment_t); i++){
-        adi_ff_segment_t* segment = &segment_table[i];
-
-        uint64_t flags = (segment->flags & ADI_FF_SEGMENT_FLAG_EXEC) ? 0 : PML_FLAGS_NO_EXEC;
-        if(segment->flags & ADI_FF_SEGMENT_FLAG_READ) flags |= PML_FLAGS_PRESENT;
-        if(segment->flags & ADI_FF_SEGMENT_FLAG_WRITE) flags |= PML_FLAGS_WRITABLE;
-
-
-        pager_map_range(pagemap, segment->virt_addr, (uint64_t)LOWER_HALF((uint64_t)drv_file + header->content_region_offset + segment->segment_offset), DIV_ROUND_UP(segment->segment_size,PAGE_SIZE), flags);
-
-        kprintf("[ADI] Segment \"%s\" mapped at 0x%lx spaning 0x%x pages with falgs 0x%lx!\n", string_table + segment->name_offset, segment->virt_addr, DIV_ROUND_UP(segment->segment_size,PAGE_SIZE), flags);
-    }
-
     for(uint64_t i = 0; i < header->metalang_table_size / sizeof(adi_ff_metalang_t); i++){
         switch (metalang_table[i].id) {
             case 0x00000001:
@@ -57,6 +44,19 @@ uint32_t adi_load(const char* drv_file) {
                 kprintf("[ADI] Driver uses an unsupported Metalanguage (0x%08x)\n", metalang_table[i].id);
                 goto error;
         }
+    }
+
+    for(uint64_t i = 0; i < header->segment_table_size / sizeof(adi_ff_segment_t); i++){
+        adi_ff_segment_t* segment = &segment_table[i];
+
+        uint64_t flags = (segment->flags & ADI_FF_SEGMENT_FLAG_EXEC) ? 0 : PML_FLAGS_NO_EXEC;
+        if(segment->flags & ADI_FF_SEGMENT_FLAG_READ) flags |= PML_FLAGS_PRESENT;
+        if(segment->flags & ADI_FF_SEGMENT_FLAG_WRITE) flags |= PML_FLAGS_WRITABLE;
+
+
+        pager_map_range(pagemap, ALIGN_DOWN(segment->virt_addr, PAGE_SIZE), (uint64_t)ALIGN_DOWN(LOWER_HALF((uint64_t)drv_file + segment->segment_offset),PAGE_SIZE), DIV_ROUND_UP(segment->segment_size,PAGE_SIZE), flags);
+
+        kprintf("[ADI] Segment \"%s\" mapped at 0x%lx spaning 0x%x pages with falgs 0x%lx!\n", string_table + segment->name_offset, segment->virt_addr, DIV_ROUND_UP(segment->segment_size,PAGE_SIZE), flags);
     }
 
     //TODO: userspace drivers
@@ -102,8 +102,13 @@ uint32_t adi_load(const char* drv_file) {
 
 
     kprintf("[ADI] Loaded driver \"%s\" by \"%s\"\n",  string_table + header->name_offset, string_table + header->author_offset);
-    kprintf("Entry point: 0x%p", header->entry_point);
+    kprintf("Entry point: %p", header->entry_point);
+
+    memcpy((char*)drv_file, drv_file + header->content_region_offset, size - header->content_region_offset); // took me so long tofigure this out
+
+    return 1;
 
     error:
+    kprintf("[ADI] Error loading driver\n");
     return 0;
 }
