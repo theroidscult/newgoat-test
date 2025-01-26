@@ -39,6 +39,8 @@ pml_entry_t* pager_create_pml(void){
 pml_entry_t* pager_get_next_lvl(pml_entry_t* prev, uint64_t index,uint64_t flags){
     pml_entry_t entry = prev[index];
 
+    prev[index] |= flags; // reapply flags
+
     if(!(entry & PML_FLAGS_PRESENT)){
         void* pa = HIGHER_HALF(mm_alloc_page());
         memset(pa, 0, PAGE_SIZE);
