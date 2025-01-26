@@ -91,7 +91,7 @@ void panic(char* format,...) {
 }
 
 void exit(bool success) {
-    kprintf("[ADI] Driver Initialization %s" , success ? "succeeded" : "failed");
+    kprintf("[ADI] Driver Initialization %s\n" , success ? "succeeded" : "failed");
     while(1);
 }
 

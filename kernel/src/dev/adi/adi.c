@@ -102,7 +102,6 @@ uint32_t adi_load(const char* drv_file,__attribute__((unused)) uint32_t size){
 
 
     kprintf("[ADI] Loaded driver \"%s\" by \"%s\"\n",  string_table + header->name_offset, string_table + header->author_offset);
-    kprintf("Entry point: %p", header->entry_point);
 
     memcpy((char*)drv_file, drv_file + header->content_region_offset, size - header->content_region_offset); // took me so long tofigure this out
 
