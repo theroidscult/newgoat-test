@@ -15,7 +15,7 @@ pml_entry_t* kernel_pm = NULL;
 
 // object space
 void* object_space = NULL;
-const uint64_t object_space_size = 10; // IN PAGES
+const uint64_t object_space_size = 10; // IN PAGES, TODO: make dynamic
 void* object_first_free = NULL;
 
 
@@ -132,17 +132,21 @@ uint32_t mm_store_obj(object_t* obj)
     object_t* cur = object_first_free; 
     while((uintptr_t)cur < (uintptr_t)object_space + (object_space_size * PAGE_SIZE)) {
         if(cur->type == OBJ_TYPE_NONE) {
-            object_first_free = cur;
+            if ((uintptr_t)cur > (uintptr_t)object_first_free) {
+                object_first_free = cur;
+            }
             return id;
         }
         cur++;
     }
-    object_first_free = NULL;
     return id;
 }
 
 object_t* mm_get_obj(uint32_t id)
 {
+    if(id >= (object_space_size * PAGE_SIZE) / sizeof(object_t)) {
+        return NULL;
+    }
     return object_space + (id * sizeof(object_t));
 }
 

@@ -6,6 +6,7 @@
 #include <mm/mm.h>
 #include <string.h>
 #include <printf.h>
+#include <panik.h>
 
 extern void panik(uint32_t code);
 
@@ -22,7 +23,7 @@ void sys_timer_isr(context_t* context) {
     mm_restore_kernel_pm();
 
     if(push_index == pop_index) {
-        panik(8);
+        panik(ERR_NO_PROCESS_TO_SCHEDULE);
     }
 
     if(current_proc_id != 0xFFFFFFFF) {
@@ -42,7 +43,7 @@ void sys_timer_isr(context_t* context) {
     memcpy(context, &proc_obj->data.sched_thread.context, sizeof(context_t));
 
     if(proc_obj->type != OBJ_TYPE_SCHED_THREAD) {
-        panik(9);
+        panik(ERR_PROCESS_IS_NOT_A_PROCESS);
     }
 
     proc_queue[push_index] = current_proc_id;

@@ -74,46 +74,6 @@ void get_adi_drivers(){
 extern void prepare_idt();
 extern void timer_isr();
 
-void hcf() {
-    __asm__ volatile ("cli");
-    while(1){
-        __asm__ volatile ("hlt");
-    }
-}
-
-void panik(uint32_t code) {
-    switch(code) {
-        case 1:
-            kprintf("Device not available\n");
-            break;
-        case 2:
-            kprintf("Double fault\n");
-            break;
-        case 3:
-            kprintf("Invalid TSS\n");
-            break;
-        case 4:
-            kprintf("Segment not present\n");
-            break;
-        case 5:
-            kprintf("Stack segment fault\n");
-            break;
-        case 6:
-            kprintf("Machine check\n");
-            break;
-        case 7:
-            kprintf("Outdated or reserved interrupt\n");
-            break;
-        case 8:
-            kprintf("No process to schedule\n");
-            break;
-        case 9:
-            kprintf("Process is not a process\n");
-            break;
-    }
-    hcf();
-}
-
 void testproc(void) {
     kprintf("Welcome to NewGoat!\n");
     while(1);
