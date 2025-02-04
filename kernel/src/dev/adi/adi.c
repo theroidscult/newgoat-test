@@ -64,13 +64,65 @@ uint32_t adi_load(const char* drv_file,__attribute__((unused)) uint32_t size){
     memset(HIGHER_HALF(stack), 0, PAGE_SIZE);
     pager_map(pagemap, (uint64_t)stack, (uint64_t)stack, PML_FLAGS_PRESENT | PML_FLAGS_WRITABLE | PML_FLAGS_NO_EXEC);
 
+    object_t driver_name_obj = {
+        .type = OBJ_TYPE_GENERIC_NAME,
+        .data = {
+            .generic_name = {
+                .next_page = 0,
+                .name = ""
+            }
+        }
+    };
+
+    char* s = string_table + header->name_offset;
+
+    for(uint32_t i = 0;s[i] && i < 250;s++){
+        driver_name_obj.data.generic_name.name[i] = s[i];
+    }
+
+    uint32_t name_id = mm_store_obj(&driver_name_obj);
+
+    object_t driver_author_obj = {
+        .type = OBJ_TYPE_GENERIC_NAME,
+        .data = {
+            .generic_name = {
+                .next_page = 0,
+                .name = ""
+            }
+        }
+    };
+
+    s = string_table + header->author_offset;
+
+    for(uint32_t i = 0;s[i] && i < 250;s++){
+        driver_author_obj.data.generic_name.name[i] = s[i];
+    }
+
+    uint32_t author_id = mm_store_obj(&driver_author_obj);
+
+    object_t driver_obj = {
+        .type = OBJ_TYPE_DRIVER,
+        .data = {
+            .driver = {
+                .name_ptr = name_id,
+                .author_ptr = author_id,
+                .ver_major = header->ver_major,
+                .ver_minor = header->ver_minor,
+                .ver_patch = header->ver_patch,
+                .devices = 0,
+            }
+        }
+    };
+
+    uint32_t driver_id = mm_store_obj(&driver_obj);
+
     object_t proc_obj = {
         .type = OBJ_TYPE_SCHED_THREAD,
         .data = {
             .sched_thread = {
-                .id = sched_get_next_proc_id(),
                 .name_ptr = 0,
                 .pagemap = LOWER_HALF(pagemap),
+                .driver_id = driver_id,
                 .context = {
                     .rax = 0,
                     .rbx = 0,
@@ -99,7 +151,6 @@ uint32_t adi_load(const char* drv_file,__attribute__((unused)) uint32_t size){
     };
 
     sched_new_proc(&proc_obj); 
-
 
     kprintf("[ADI] Loaded driver \"%s\" by \"%s\"\n",  string_table + header->name_offset, string_table + header->author_offset);
 

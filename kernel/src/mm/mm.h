@@ -24,23 +24,50 @@ typedef struct {
 } memstats_t;
 
 #define OBJ_TYPE_NONE 0
-#define OBJ_TYPE_SCHED_THREAD 1
-#define OBJ_TYPE_SCHED_PROC_NAME 2
+#define OBJ_TYPE_GENERIC_NAME 1
+#define OBJ_TYPE_GENERIC_FPTRS 2
+#define OBJ_TYPE_SCHED_THREAD 3
+#define OBJ_TYPE_DRIVER 4
+#define OBJ_TYPE_DEVICE 5
+#define OBJ_TYPE_METALANG_IMPL 6
+
+typedef uint32_t object_id_t;
 
 typedef struct {
     uint16_t type;
     union {
         struct {
-            uint16_t id;
-            uint32_t name_ptr;
+            object_id_t next_page;
+            char name[250];
+        } __attribute__((packed)) generic_name;
+        struct {
+            object_id_t next_page;
+            uintptr_t fptrs[31];
+        } __attribute__((packed)) generic_fptrs;
+        struct {
+            object_id_t name_ptr; 
             pml_entry_t* pagemap;
             context_t context;
-            char slack[64];
+            object_id_t driver_id;
+            char slack[70];
         } __attribute__((packed)) sched_thread;
         struct {
-            uint32_t next_page;
-            char name[250];
-        } __attribute__((packed)) sched_proc_name;
+            object_id_t name_ptr;
+            object_id_t author_ptr;
+            uint8_t ver_major;
+            uint8_t ver_minor;
+            uint8_t ver_patch;
+            object_id_t devices;
+        } __attribute__((packed)) driver;
+        struct {
+            object_id_t metalang_impls;
+            char slack[235];
+        } __attribute__((packed)) device;
+        struct {
+            object_id_t next;
+            uint32_t id;
+            object_id_t fptrs;
+        } __attribute__((packed)) metalang_impl;
     } data;
 } object_t;
 

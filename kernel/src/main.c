@@ -151,9 +151,9 @@ void _start(void) {
         .type = OBJ_TYPE_SCHED_THREAD,
         .data = {
             .sched_thread = {
-                .id = sched_get_next_proc_id(),
                 .name_ptr = 0,
                 .pagemap = LOWER_HALF(pm),
+                .driver_id = 0,
                 .context = {
                     .rax = 0,
                     .rbx = 0,
@@ -173,7 +173,6 @@ void _start(void) {
                     .rip = (uint64_t)testproc,
                     .rsp = (uint64_t)stack + PAGE_SIZE,
                     .rbp = (uint64_t)stack + PAGE_SIZE,
-
                     .cs = 0x8,
                     .ss = 0x10,
                     .rflags = 0x202

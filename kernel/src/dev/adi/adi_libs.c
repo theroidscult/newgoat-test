@@ -4,8 +4,6 @@
 #include <stdint.h>
 #include <string.h>
 
-uint64_t adi_libs_start;
-
 
 metalang_x86_64_t x86_64_m = (metalang_x86_64_t){
     
@@ -152,4 +150,3 @@ adi_core_t core = (adi_core_t){
     .memcpy = alib_memcpy,
     .memset = alib_memset,
 };
-uint64_t adi_libs_end;
