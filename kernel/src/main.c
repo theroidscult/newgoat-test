@@ -154,6 +154,8 @@ void _start(void) {
 
     sched_new_proc(&proc_obj);
 
+    mm_obj_print_all();
+
     idt_set_irq(0, timer_isr, 1);
     pic_unmask(0);
     pit_start(1000);

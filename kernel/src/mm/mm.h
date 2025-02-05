@@ -82,4 +82,6 @@ uint32_t mm_store_obj(object_t* obj);
 object_t* mm_get_obj(uint32_t id);
 void mm_free_obj(uint32_t id);
 
+void mm_obj_print_all();
+
 #endif // __PMM_H__

@@ -158,3 +158,57 @@ void mm_free_obj(uint32_t id)
         object_first_free = (void*)obj;
     }
 }
+
+void mm_obj_print_all() {
+    object_t* cur = object_space;
+    while((uintptr_t)cur < (uintptr_t)object_space + (object_space_size * PAGE_SIZE)) {
+        if(cur->type != OBJ_TYPE_NONE) {
+            switch(cur->type) {
+                case OBJ_TYPE_GENERIC_NAME:
+                    kprintf("Generic Name at [id: %d]\n", ((uintptr_t)cur - (uintptr_t)object_space) / sizeof(object_t));
+                    kprintf("Value: %s\n\n", cur->data.generic_name.name);
+                    break;
+
+                case OBJ_TYPE_GENERIC_FPTRS:
+                    kprintf("Generic Fptrs at [id: %d]\n", ((uintptr_t)cur - (uintptr_t)object_space) / sizeof(object_t));
+                    kprintf("TODO: print all nonzero fptrs\n\n");
+                    break;
+
+                case OBJ_TYPE_SCHED_THREAD:
+                    kprintf("Sched Thread at [id: %d]\n", ((uintptr_t)cur - (uintptr_t)object_space) / sizeof(object_t));
+                    kprintf("name_ptr: %d\n", cur->data.sched_thread.name_ptr);
+                    kprintf("context: \n");
+                    kprintf("RAX: %p; RBX: %p; RCX: %p; RDX: %p\n RSI: %p; RDI: %p; RSP: %p; RBP: %p\n R8: %p; R9: %p; R10: %p; R11: %p\n R12: %p; R13: %p; R14: %p; R15: %p\n",
+                        cur->data.sched_thread.context.rax,cur->data.sched_thread.context.rbx,cur->data.sched_thread.context.rcx,cur->data.sched_thread.context.rdx, 
+                        cur->data.sched_thread.context.rsi,cur->data.sched_thread.context.rdi,cur->data.sched_thread.context.rsp,cur->data.sched_thread.context.rbp,
+                        cur->data.sched_thread.context.r8,cur->data.sched_thread.context.r9,cur->data.sched_thread.context.r10,cur->data.sched_thread.context.r11,
+                        cur->data.sched_thread.context.r12,cur->data.sched_thread.context.r13,cur->data.sched_thread.context.r14,cur->data.sched_thread.context.r15);
+                    kprintf("Driver ID: %p\n",cur->data.sched_thread.driver_id);
+                    kprintf("Pagemap: %p\n\n",cur->data.sched_thread.pagemap);
+                    break;
+
+                case OBJ_TYPE_DEVICE:
+                    kprintf("Device at [id: %d]\n", ((uintptr_t)cur - (uintptr_t)object_space) / sizeof(object_t));
+                    kprintf("Metalang impls: %d\n\n", cur->data.device.metalang_impls);
+                    break;
+
+                case OBJ_TYPE_DRIVER:
+                    kprintf("Driver at [id: %d]\n", ((uintptr_t)cur - (uintptr_t)object_space) / sizeof(object_t));
+                    kprintf("Name: %p\n", cur->data.driver.name_ptr);
+                    kprintf("Author: %p\n", cur->data.driver.author_ptr);
+                    kprintf("Version: %d.%d.%d\n", cur->data.driver.ver_major, cur->data.driver.ver_minor, cur->data.driver.ver_patch);
+                    kprintf("Devices: %p\n\n", cur->data.driver.devices);
+                    break;
+
+                case OBJ_TYPE_METALANG_IMPL:
+                    kprintf("Metalang impl at [id: %d]\n", ((uintptr_t)cur - (uintptr_t)object_space) / sizeof(object_t));
+                    kprintf("ID: %d\n", cur->data.metalang_impl.id);
+                    kprintf("Next: %d\n", cur->data.metalang_impl.next);
+                    kprintf("Fptrs: %d\n\n", cur->data.metalang_impl.fptrs);
+                    break;
+
+            }
+        }
+        cur++;
+    }
+}
