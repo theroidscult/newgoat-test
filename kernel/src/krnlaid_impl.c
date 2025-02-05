@@ -1,3 +1,4 @@
+//nanoprintf
 #include <dev/cereal.h>
 #include <stdarg.h>
 
@@ -18,3 +19,7 @@ void print_char(int c, __attribute__((unused)) void *ctx) {
 
     cereal_write(0x3f8, (char)c);
 }
+
+//string.h
+#define STRING_IMPL
+#include <string.h>

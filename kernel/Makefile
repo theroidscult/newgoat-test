@@ -9,6 +9,7 @@ ASM := nasm
 
 override CFLAGS += \
     -I src \
+    -I src/KrnlAid/stdlib \
     -Wall \
     -Wextra \
     -Werror \
