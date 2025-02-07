@@ -74,11 +74,7 @@ uint32_t adi_load(const char* drv_file,__attribute__((unused)) uint32_t size){
         }
     };
 
-    char* s = string_table + header->name_offset;
-
-    for(uint32_t i = 0;s[i] && i < 250;s++){
-        driver_name_obj.data.generic_name.name[i] = s[i];
-    }
+    strncpy(driver_name_obj.data.generic_name.name, string_table + header->name_offset, 250);
 
     uint32_t name_id = mm_store_obj(&driver_name_obj);
 
@@ -92,11 +88,7 @@ uint32_t adi_load(const char* drv_file,__attribute__((unused)) uint32_t size){
         }
     };
 
-    s = string_table + header->author_offset;
-
-    for(uint32_t i = 0;s[i] && i < 250;s++){
-        driver_author_obj.data.generic_name.name[i] = s[i];
-    }
+    strncpy(driver_author_obj.data.generic_name.name, string_table + header->author_offset, 250);
 
     uint32_t author_id = mm_store_obj(&driver_author_obj);
 
