@@ -31,6 +31,9 @@
 #define ERR_NO_INIT_KEY_IN_REGISTERY            0x00000006A
 #define ERR_REQUIRED_INIT_STEP_FAILED           0x00000006B
 
+//Misc
+#define ERR_ASSERT_FAILED                       0x0000fffff
+
 void panik(uint32_t code);
 
 #endif // __PANIK_H__

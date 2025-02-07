@@ -34,8 +34,41 @@ void panik(uint32_t code) {
         case ERR_PROCESS_IS_NOT_A_PROCESS:
             kprintf("Process is not a process\n");
             break;
+        case ERR_PROCESS0_KILLED:
+            kprintf("Process0 killed\n");
+            break;
 
-        
+        //Memory errors
+        case ERR_OUT_OF_MEMORY:
+            kprintf("Out of memory\n");
+            break;
+
+        //Registery errors
+        case ERR_NO_REGISTERY_FILE:
+            kprintf("No registery file\n");
+            break; 
+        case ERR_CORRUPTED_REGISTERY:
+            kprintf("Corrupted registery\n");
+            break;
+
+
+        //INIT errors
+        case ERR_NO_ROOT_FILESYSTEM:
+            kprintf("No root filesystem\n");
+            break;
+        case ERR_NO_INIT_KEY_IN_REGISTERY:
+            kprintf("No init key in registery\n");
+            break;
+        case ERR_REQUIRED_INIT_STEP_FAILED:
+            kprintf("Required init step failed\n");
+            break;
+
+
+        //Misc errors
+        case ERR_ASSERT_FAILED:
+            kprintf("Assert failed\n");
+            break;
+
         default: 
             kprintf("Unknown error code %d\n", code);
             break;
