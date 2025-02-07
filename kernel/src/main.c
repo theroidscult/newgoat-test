@@ -8,6 +8,7 @@
 
 #include <KrnlAid/arch/x86/gdt.h>
 #include <printf.h>
+#include "logger.h"
 
 #include <sys/pic.h>
 #include <sys/idt.h> 
@@ -98,13 +99,13 @@ void _start(void) {
     hhdm_ptr = (struct limine_hhdm_response*)hhdm.response;
 
     prepare_gdt();
-    kprintf("GDT initialized\n");
+    log_debug("GDT initialized\n");
     prepare_idt();
     pic_init();
     __asm__ volatile ("sti");
-    kprintf("Interrupts enabled\n");
+    log_debug("Interrupts enabled\n");
     mm_init();
-    kprintf("Memory initialized\n");
+    log_debug("Memory initialized\n");
 
     tss.rsp0 = (uint64_t)kernel_stack + KERNEL_STACK_SIZE;
     tss.ist[0] = (uint64_t)kernel_stack + KERNEL_STACK_SIZE;
