@@ -63,10 +63,10 @@ void prepare_gdt() {
 int ends_with(const char* str, const char* suffix) {
     size_t str_len = strlen(str);
     size_t suffix_len = strlen(suffix);
-    
+
     // Ensure suffix isn't longer than the string
     if (suffix_len > str_len) return 0;
-    
+
     // Compare the end of str with suffix
     return strncmp(str + str_len - suffix_len, suffix, suffix_len) == 0;
 }

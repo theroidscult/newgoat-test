@@ -1,5 +1,6 @@
 #include <printf.h>
 #include <panik.h>
+#include <config.h>
 static inline void ____kprintf(const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
