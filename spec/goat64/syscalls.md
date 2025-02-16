@@ -1,4 +1,4 @@
-# Roids64 syscalls
+# Goat64 syscalls
 ## Definitions
 `int` is a number that can be stored in a single register on the target architecture</br>
 

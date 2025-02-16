@@ -1,6 +1,6 @@
-# The Roids64 event system
+# The Goat64 event system
 
-The Roids64 event system is very simple and let's processes create, subscribe to, fire, unsubscribe from and delete events.
+The Goat64 event system is very simple and let's processes create, subscribe to, fire, unsubscribe from and delete events.
 An event holds the following information:
 * the event type ID
 * the event priority

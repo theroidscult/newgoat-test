@@ -1,5 +1,5 @@
-# The Roids64 VFS
-The Roids64 VFS doesn't only manage files and directories but also all resources accessable via a URL, because I stole the "Everything is a URL" philosophy from RedoxOS.
+# The Goat64 VFS
+The Goat64 VFS doesn't only manage files and directories but also all resources accessable via a URL, because I stole the "Everything is a URL" philosophy from RedoxOS.
 
 URL format: `[<scheme>:/][/]<the rest>`
 the scheme can be an unmounted partition by id(like `sda1` or a GPT GUID), a network protocol(like `https` or `gopher`), or a resource(like `proc` or `zero`).

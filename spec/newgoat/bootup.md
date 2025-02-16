@@ -8,4 +8,4 @@
 7. Newgoat initializes the scheduler
 8. Newgoat sets up the asr32 startup code
 9. Newgoat starts the scheduler
-10. Roids64 starts all startup processes from the registery
+10. Goat64 starts all startup processes from the registery
