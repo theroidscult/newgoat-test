@@ -1,2 +1,2 @@
 # The codename "Asriel" executive layer API
-[asr32](asr32/asr32.md) will be included in the kernel executable
+[asr32](goat64/goat64.md) will be included in the kernel executable
