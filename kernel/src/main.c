@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <dev/cereal.h>
-#include <dev/adi/adi.h>
 
 #include <KrnlAid/arch/x86/gdt.h>
 #include <printf.h>
@@ -60,29 +59,6 @@ void prepare_gdt() {
     load_tss(0x28);
 }
 
-int ends_with(const char* str, const char* suffix) {
-    size_t str_len = strlen(str);
-    size_t suffix_len = strlen(suffix);
-
-    // Ensure suffix isn't longer than the string
-    if (suffix_len > str_len) return 0;
-
-    // Compare the end of str with suffix
-    return strncmp(str + str_len - suffix_len, suffix, suffix_len) == 0;
-}
-
-void get_adi_drivers(){
-    for(uint64_t i = 0; i < modules.response->module_count; i++){
-        if(modules.response->modules[i] == NULL){
-            kprintf("Module %d is NULL\n", i);
-            continue;
-        }
-        if(ends_with(modules.response->modules[i]->path, ".adi")){
-            adi_load((const char*)modules.response->modules[i]->address, modules.response->modules[i]->size);
-        }
-    }
-}
-
 extern void prepare_idt();
 extern void timer_isr();
 
@@ -109,8 +85,6 @@ void _start(void) {
 
     tss.rsp0 = (uint64_t)kernel_stack + KERNEL_STACK_SIZE;
     tss.ist[0] = (uint64_t)kernel_stack + KERNEL_STACK_SIZE;
-
-    get_adi_drivers();
 
     pml_entry_t* pm = pager_create_pml();
     void* stack = HIGHER_HALF(mm_alloc_page());

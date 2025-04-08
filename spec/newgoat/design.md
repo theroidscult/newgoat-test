@@ -16,6 +16,3 @@ The scheduler manages processes
 
 ### ADI and Drivers
 The ADI system loads ADI drivers and provides metalanguages for said drivers.
-
-### ASI
-The ASI system loads ASI services...

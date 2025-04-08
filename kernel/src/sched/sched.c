@@ -57,6 +57,10 @@ void sys_timer_isr(context_t* context) {
     pic_eoi(0);
 }
 
+uint32_t sched_get_current_proc_id() {
+    return current_proc_id;
+}
+
 uint32_t sched_new_proc(object_t* proc_obj) {
     uint32_t id = mm_store_obj(proc_obj);
     if(push_index > QUEUE_SUZE) {
