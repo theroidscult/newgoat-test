@@ -62,6 +62,7 @@ void pager_map(pml_entry_t* pml, uint64_t va, uint64_t pa, uint64_t flags){
     pml_entry_t* page = pager_get_next_lvl(pml2, pml2_index, flags);
 
     page[pml1_index] = pa | flags;
+    pager_invlpg(va);
 }
 
 void pager_unmap(pml_entry_t* pml, uint64_t va){
@@ -75,6 +76,7 @@ void pager_unmap(pml_entry_t* pml, uint64_t va){
     pml_entry_t* page = pager_get_next_lvl(pml2, pml2_index, 0);
 
     page[pml1_index] = 0;
+    pager_invlpg(va);
 }
 
 void pager_map_range(pml_entry_t* pml, uint64_t va, uint64_t pa, uint64_t size, uint64_t flags){

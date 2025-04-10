@@ -186,27 +186,6 @@ void mm_obj_print_all() {
                     kprintf("Driver ID: %p\n",cur->data.sched_thread.driver_id);
                     kprintf("Pagemap: %p\n\n",cur->data.sched_thread.pagemap);
                     break;
-
-                case OBJ_TYPE_DEVICE:
-                    kprintf("Device at [id: %d]\n", ((uintptr_t)cur - (uintptr_t)object_space) / sizeof(object_t));
-                    kprintf("Metalang impls: %d\n\n", cur->data.device.metalang_impls);
-                    break;
-
-                case OBJ_TYPE_DRIVER:
-                    kprintf("Driver at [id: %d]\n", ((uintptr_t)cur - (uintptr_t)object_space) / sizeof(object_t));
-                    kprintf("Name: %p\n", cur->data.driver.name_ptr);
-                    kprintf("Author: %p\n", cur->data.driver.author_ptr);
-                    kprintf("Version: %d.%d.%d\n", cur->data.driver.ver_major, cur->data.driver.ver_minor, cur->data.driver.ver_patch);
-                    kprintf("Devices: %p\n\n", cur->data.driver.devices);
-                    break;
-
-                case OBJ_TYPE_METALANG_IMPL:
-                    kprintf("Metalang impl at [id: %d]\n", ((uintptr_t)cur - (uintptr_t)object_space) / sizeof(object_t));
-                    kprintf("ID: %d\n", cur->data.metalang_impl.id);
-                    kprintf("Next: %d\n", cur->data.metalang_impl.next);
-                    kprintf("Fptrs: %d\n\n", cur->data.metalang_impl.fptrs);
-                    break;
-
             }
         }
         cur++;
