@@ -63,8 +63,15 @@ extern void prepare_idt();
 extern void timer_isr();
 
 void testproc(void) {
-    kprintf("Welcome to NewGoat!\n");
-    while(1);
+    while(1){
+        kprintf("a");
+    }
+}
+
+void testproc2(void) {
+    while(1){
+        kprintf("b");
+    }
 }
 
 void _start(void) {
@@ -128,6 +135,43 @@ void _start(void) {
     };
 
     sched_new_proc(&proc_obj);
+
+    object_t proc_obj2 = {
+        .type = OBJ_TYPE_SCHED_THREAD,
+        .data = {
+            .sched_thread = {
+                .name_ptr = 0,
+                .pagemap = LOWER_HALF(pm),
+                .driver_id = 0,
+                .context = {
+                    .rax = 0,
+                    .rbx = 0,
+                    .rcx = 0,
+                    .rdx = 0,
+                    .rsi = 0,
+                    .rdi = 0,
+                    .r8 = 0,
+                    .r9 = 0,
+                    .r10 = 0,
+                    .r11 = 0,
+                    .r12 = 0,
+                    .r13 = 0,
+                    .r14 = 0,
+                    .r15 = 0,
+                    .error = 0,
+                    .rip = (uint64_t)testproc2,
+                    .rsp = (uint64_t)stack + PAGE_SIZE,
+                    .rbp = (uint64_t)stack + PAGE_SIZE,
+                    .cs = 0x8,
+                    .ss = 0x10,
+                    .rflags = 0x202
+                }
+            }
+        }
+    };
+
+    sched_new_proc(&proc_obj2);
+
 
     mm_obj_print_all();
 
