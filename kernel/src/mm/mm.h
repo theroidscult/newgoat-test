@@ -53,7 +53,7 @@ typedef struct {
 
 void mm_init(void);
 memstats_t mm_poll_mstats(void);
-void* mm_alloc_page();
+void* mm_alloc_pages(uint64_t count);
 void mm_free_pages(void* page, uint64_t size);
 
 void mm_restore_kernel_pm();

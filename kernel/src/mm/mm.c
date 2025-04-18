@@ -50,11 +50,8 @@ void mm_init(void) {
     free_mem_size = usable_mem_size;
 
     //reserve object space
-    object_space = (void*)mm_alloc_page();
+    object_space = (void*)mm_alloc_pages(object_space_size);
     object_first_free = object_space;
-    for(uint64_t i = 0; i < object_space_size - 1; i++) {
-        mm_alloc_page(); //allocate the next page too!
-    }
 
     //set up the kernel PM
     kernel_pm = pager_get_current_pml();
@@ -74,13 +71,13 @@ memstats_t mm_poll_mstats(void) {
     };
 }
 
-void* mm_alloc_page() {
+void* mm_alloc_pages(uint64_t count) {
     freelist_entry_t *toret = LOWER_HALF(tail);
     if(tail == NULL) {
         return NULL;
     }
-    if(tail->size > 1) {
-        freelist_entry_t *new_tail = (freelist_entry_t*)((char*)tail + PAGE_SIZE);
+    if(tail->size > count) {
+        freelist_entry_t *new_tail = (freelist_entry_t*)((char*)tail + PAGE_SIZE * count);
         new_tail->size = tail->size - 1;
         new_tail->next = tail->next;
         tail = new_tail;

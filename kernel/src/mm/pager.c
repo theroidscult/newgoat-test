@@ -23,7 +23,7 @@ void pager_invlpg(uint64_t va){
 
 
 pml_entry_t* pager_create_pml(void){
-    pml_entry_t* toret = HIGHER_HALF(mm_alloc_page());
+    pml_entry_t* toret = HIGHER_HALF(mm_alloc_pages(1));
     pml_entry_t* cur = HIGHER_HALF(pager_get_current_pml());
 
     for(int i = 0; i < 512; i++){
@@ -42,7 +42,7 @@ pml_entry_t* pager_get_next_lvl(pml_entry_t* prev, uint64_t index,uint64_t flags
     prev[index] |= flags & 0xff; // reapply flags, except no exec
 
     if(!(entry & PML_FLAGS_PRESENT)){
-        void* pa = HIGHER_HALF(mm_alloc_page());
+        void* pa = HIGHER_HALF(mm_alloc_pages(1));
         memset(pa, 0, PAGE_SIZE);
         prev[index] = (uint64_t)LOWER_HALF(pa) | flags;
         return (pml_entry_t*)pa;

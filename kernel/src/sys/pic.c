@@ -33,7 +33,7 @@ void pic_eoi(uint8_t irq) {
         io_wait();
     }
 
-    outb(PIC1_COMMAND, 0x20);
+    outb(PIC2_COMMAND, 0x20);
     io_wait();
 }
 
